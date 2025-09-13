@@ -70,7 +70,6 @@ public class VehicleServiceImpl implements VehicleService {
         Owner owner = ownerRepository.findByJmbg(createVehicleDto.getOwnerJmbg());
 
         Vehicle vehicle = new Vehicle();
-
         vehicle.setId(UUID.randomUUID().toString());
         vehicle.setMark(createVehicleDto.getMark());
         vehicle.setModel(createVehicleDto.getModel());
