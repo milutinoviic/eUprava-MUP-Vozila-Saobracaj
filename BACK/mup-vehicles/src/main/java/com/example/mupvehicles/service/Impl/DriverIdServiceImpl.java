@@ -53,5 +53,28 @@ public class DriverIdServiceImpl implements DriverIdService {
 
     }
 
+    @Override
+    public DriverIdDto getDriverId(String jmbg) {
+
+        if(!ownerRepository.existsByJmbg(jmbg)) {
+            throw new RuntimeException("Owner does not exist");
+        }
+        DriverId driverId = driverIdRepository.findByOwner_Jmbg(jmbg);
+
+        if(driverId == null) {
+            return null;
+        }
+        return driverIdMapper.convertDriverIdToDto(driverId);
+
+    }
+
+    @Override
+    public void deleteDriverId(String driverId) {
+        if (!driverIdRepository.existsById(driverId)) {
+            throw new RuntimeException("DriverId not found: " + driverId);
+        }
+        driverIdRepository.deleteById(driverId);
+    }
+
 
 }

@@ -25,8 +25,14 @@ public class OwnerController {
     }
 
     @PostMapping("/createOwner")
-    public ResponseEntity<OwnerDto> getOwnerByRegistration(@RequestBody CreateOwnerDto createOwnerDto) {
+    public ResponseEntity<OwnerDto> createOwner(@RequestBody CreateOwnerDto createOwnerDto) {
         return new ResponseEntity<>(ownerService.createOwner(createOwnerDto), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOwner(@PathVariable String id) {
+        ownerService.deleteOwner(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

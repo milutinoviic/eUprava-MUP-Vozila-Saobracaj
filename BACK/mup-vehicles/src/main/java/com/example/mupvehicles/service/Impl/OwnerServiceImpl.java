@@ -3,13 +3,18 @@ package com.example.mupvehicles.service.Impl;
 import com.example.mupvehicles.dto.CreateOwnerDto;
 import com.example.mupvehicles.dto.OwnerDto;
 import com.example.mupvehicles.mapper.OwnerMapper;
+import com.example.mupvehicles.model.DriverId;
 import com.example.mupvehicles.model.Owner;
+import com.example.mupvehicles.model.Vehicle;
+import com.example.mupvehicles.repository.DriverIdRepository;
 import com.example.mupvehicles.repository.OwnerRepository;
 import com.example.mupvehicles.repository.VehicleRepository;
 import com.example.mupvehicles.service.OwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,12 +23,14 @@ public class OwnerServiceImpl implements OwnerService {
     private final OwnerRepository ownerRepository;
     private final VehicleRepository vehicleRepository;
     private final OwnerMapper ownerMapper;
+    private final DriverIdRepository driverIdRepository;
 
     @Autowired
-    public OwnerServiceImpl(OwnerRepository ownerRepository,VehicleRepository vehicleRepository,OwnerMapper ownerMapper) {
+    public OwnerServiceImpl(OwnerRepository ownerRepository, VehicleRepository vehicleRepository, OwnerMapper ownerMapper, DriverIdRepository driverIdRepository) {
         this.ownerRepository = ownerRepository;
         this.vehicleRepository = vehicleRepository;
         this.ownerMapper = ownerMapper;
+        this.driverIdRepository = driverIdRepository;
     }
 
     @Override
@@ -58,6 +65,27 @@ public class OwnerServiceImpl implements OwnerService {
 
         return ownerMapper.convertOwnerToOwnerDto(owner);
 
+    }
+
+    @Override
+    public void deleteOwner(String ownerId) {
+
+        Owner owner = ownerRepository.findById(ownerId)
+                .orElseThrow(() -> new RuntimeException("Owner not found: " + ownerId));
+
+
+        List<Vehicle> vehicleList = vehicleRepository.findByOwnerJmbg(owner.getJmbg());
+
+        if(!vehicleList.isEmpty()) {
+            throw new RuntimeException("Can not delete owner, owner has vehicles");
+        }
+
+        Optional<DriverId> driverId = driverIdRepository.findByOwner(owner);
+        if (driverId.isPresent()) {
+            throw new RuntimeException("Can not delete owner, driver has driverId");
+        }
+
+        ownerRepository.delete(owner);
     }
 
 }

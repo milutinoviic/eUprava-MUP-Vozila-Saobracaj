@@ -8,4 +8,6 @@ public interface OwnerService {
     OwnerDto getOwnerByRegistration(String registration);
 
     OwnerDto createOwner(CreateOwnerDto createOwnerDto);
+
+    void deleteOwner(String ownerId);
 }
