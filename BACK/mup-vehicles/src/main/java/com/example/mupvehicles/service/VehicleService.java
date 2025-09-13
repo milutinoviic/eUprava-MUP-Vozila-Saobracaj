@@ -1,5 +1,6 @@
 package com.example.mupvehicles.service;
 
+import com.example.mupvehicles.dto.CreateVehicleDto;
 import com.example.mupvehicles.dto.VehicleDto;
 import com.example.mupvehicles.dto.VehicleSearchRequest;
 
@@ -12,5 +13,7 @@ public interface VehicleService {
     List<VehicleDto> searchVehicles(VehicleSearchRequest vehicleSearchRequest);
 
     VehicleDto findVehicleByRegistration(String registration);
+
+    VehicleDto createVehicle(CreateVehicleDto createVehicleDto);
 
 }

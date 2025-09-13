@@ -1,9 +1,11 @@
 package com.example.mupvehicles.controller;
 
+import com.example.mupvehicles.dto.CreateVehicleDto;
 import com.example.mupvehicles.dto.VehicleDto;
 import com.example.mupvehicles.dto.VehicleSearchRequest;
 import com.example.mupvehicles.service.VehicleService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,11 @@ public class VehicleController {
     @GetMapping("/registration/{registration}")
     public VehicleDto findVehicleByRegistration(@PathVariable String registration) {
         return vehicleService.findVehicleByRegistration(registration);
+    }
+
+    @PostMapping("/createVehicle")
+    public VehicleDto createVehicle(@Valid @RequestBody CreateVehicleDto createVehicleDto) {
+        return vehicleService.createVehicle(createVehicleDto);
     }
 
 }

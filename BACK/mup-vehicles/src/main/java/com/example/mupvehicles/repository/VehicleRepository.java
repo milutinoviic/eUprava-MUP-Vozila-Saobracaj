@@ -30,4 +30,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, String> {
     );
 
     Vehicle findVehicleByRegistration(String registration);
+
+    boolean existsByRegistration(String registration);
 }
