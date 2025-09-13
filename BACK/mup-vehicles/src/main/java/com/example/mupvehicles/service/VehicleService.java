@@ -11,4 +11,6 @@ public interface VehicleService {
 
     List<VehicleDto> searchVehicles(VehicleSearchRequest vehicleSearchRequest);
 
+    VehicleDto findVehicleByRegistration(String registration);
+
 }

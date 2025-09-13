@@ -2,7 +2,6 @@ package com.example.mupvehicles.controller;
 
 import com.example.mupvehicles.dto.VehicleDto;
 import com.example.mupvehicles.dto.VehicleSearchRequest;
-import com.example.mupvehicles.model.Vehicle;
 import com.example.mupvehicles.service.VehicleService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +30,11 @@ public class VehicleController {
     @PostMapping("/search")
     public List<VehicleDto> searchVehicles(@RequestBody VehicleSearchRequest request) {
         return vehicleService.searchVehicles(request);
+    }
+
+    @GetMapping("/registration/{registration}")
+    public VehicleDto findVehicleByRegistration(@PathVariable String registration) {
+        return vehicleService.findVehicleByRegistration(registration);
     }
 
 }

@@ -38,5 +38,14 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleMapper.convertToVehicleDtoList(vehicleList);
     }
 
+    @Override
+    public VehicleDto findVehicleByRegistration(String registration) {
+        Vehicle vehicle = vehicleRepository.findVehicleByRegistration(registration);
+        if (vehicle == null) {
+            return null;
+        }
+        return vehicleMapper.converttoVehicleDto(vehicle);
+    }
+
 
 }

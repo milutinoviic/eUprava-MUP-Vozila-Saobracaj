@@ -28,4 +28,6 @@ public interface VehicleRepository extends JpaRepository<Vehicle, String> {
             @Param("color") String color,
             @Param("registration") String registration
     );
+
+    Vehicle findVehicleByRegistration(String registration);
 }
