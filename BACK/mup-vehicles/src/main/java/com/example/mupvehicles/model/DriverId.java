@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class DriverID {
+public class DriverId {
 
     @Id
     private String id = UUID.randomUUID().toString();
