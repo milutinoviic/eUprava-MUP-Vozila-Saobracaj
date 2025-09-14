@@ -32,7 +32,7 @@ public class OwnerController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOwner(@PathVariable String id) {
         ownerService.deleteOwner(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
 }
