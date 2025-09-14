@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -57,11 +58,22 @@ public class OwnershipTransferServiceImpl implements OwnershipTransferService {
 
         return ownerTransferMapper.convertTransferOwnershipToTransferOwnershipDto(transfer);
 
-
-
-
-
     }
+
+    @Override
+    public List<OwnershipTransferDto> getOwnershipHistoryForInvestigation(String registration){
+
+        Vehicle vehicle = vehicleRepository.findVehicleByRegistration(registration);
+
+        if(vehicle == null){
+            throw new RuntimeException("Vehicle doesn't exist");
+        }
+
+        List<OwnershipTransfer> ownershipTransferList = ownershipTransferRepository.findByVehicle(vehicle);
+        return ownerTransferMapper.convertTransferOwnershipListToTransferOwnershipDtoList(ownershipTransferList);
+    }
+
+
 
 
 }

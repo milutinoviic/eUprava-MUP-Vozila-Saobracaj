@@ -2,10 +2,10 @@ package com.example.mupvehicles.controller;
 
 import com.example.mupvehicles.dto.CreateDriverIdDto;
 import com.example.mupvehicles.dto.DriverIdDto;
+import com.example.mupvehicles.dto.SuspendDriverIdRequest;
 import com.example.mupvehicles.service.DriverIdService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +34,16 @@ public class DriverIdController {
     public ResponseEntity<Void> deleteDriverId(@PathVariable String id) {
         driverIdService.deleteDriverId(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/suspendDriverId")
+    public DriverIdDto suspendDriverId(@Valid @RequestBody SuspendDriverIdRequest suspendDriverIdRequest) {
+        return driverIdService.suspendDriverId(suspendDriverIdRequest);
+    }
+
+    @PatchMapping("/reactivateDriverId/{reactivateDriverId}")
+    public DriverIdDto reactivateDriverId(@Valid @PathVariable String reactivateDriverId) {
+        return driverIdService.reactivateDriverId(reactivateDriverId);
     }
 
 

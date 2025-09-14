@@ -2,6 +2,7 @@ package com.example.mupvehicles.service.Impl;
 
 import com.example.mupvehicles.dto.CreateDriverIdDto;
 import com.example.mupvehicles.dto.DriverIdDto;
+import com.example.mupvehicles.dto.SuspendDriverIdRequest;
 import com.example.mupvehicles.mapper.DriverIdMapper;
 import com.example.mupvehicles.model.DriverId;
 import com.example.mupvehicles.model.Owner;
@@ -74,6 +75,40 @@ public class DriverIdServiceImpl implements DriverIdService {
             throw new RuntimeException("DriverId not found: " + driverId);
         }
         driverIdRepository.deleteById(driverId);
+    }
+
+    @Override
+    public DriverIdDto suspendDriverId(SuspendDriverIdRequest suspendDriverIdRequest){
+
+        DriverId driverId = driverIdRepository.findById(suspendDriverIdRequest.getDriverId())
+                .orElseThrow(() -> new RuntimeException("DriverId not found: " + suspendDriverIdRequest.getDriverId()));
+
+        int numberOfViolationPoints = driverId.getNumberOfViolationPoints() + suspendDriverIdRequest.getNumberOfViolationPoints();
+
+        driverId.setNumberOfViolationPoints(numberOfViolationPoints);
+
+        if(numberOfViolationPoints >= 9){
+            driverId.setSuspended(true);
+        }
+        driverIdRepository.save(driverId);
+
+        return driverIdMapper.convertDriverIdToDto(driverId);
+
+    }
+
+    @Override
+    public DriverIdDto reactivateDriverId(String id){
+
+        DriverId driverId = driverIdRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("DriverId not found: " + id));
+
+        driverId.setNumberOfViolationPoints(0);
+        driverId.setSuspended(false);
+
+        driverIdRepository.save(driverId);
+        return driverIdMapper.convertDriverIdToDto(driverId);
+
+
     }
 
 

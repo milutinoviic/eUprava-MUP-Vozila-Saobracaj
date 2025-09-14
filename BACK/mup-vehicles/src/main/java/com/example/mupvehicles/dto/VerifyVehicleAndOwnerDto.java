@@ -1,19 +1,14 @@
 package com.example.mupvehicles.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CreateDriverIdDto {
+public class VerifyVehicleAndOwnerDto {
 
     @NotNull(message = "Value cannot be null")
-    private String picture;
+    private String registration;
 
     @NotNull(message = "Value cannot be null")
-    private String ownerJmbg;
-
+    private String jmbg;
 }

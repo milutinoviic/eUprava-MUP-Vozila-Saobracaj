@@ -7,20 +7,25 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/ownerTransfers")
 public class OwnershipTransferController {
 
-    private OwnershipTransferService ownershipTransferService;
+    private final OwnershipTransferService ownershipTransferService;
 
     @Autowired
     public OwnershipTransferController(OwnershipTransferService ownershipTransferService) {
         this.ownershipTransferService = ownershipTransferService;
+    }
+
+    @GetMapping("/getOwnershipTransferForVehicle/{registration}")
+    public ResponseEntity<List<OwnershipTransferDto>> getOwnershipHistoryForInvestigation(@PathVariable String registration) {
+        return new ResponseEntity<>(ownershipTransferService.getOwnershipHistoryForInvestigation(registration), HttpStatus.OK);
+
     }
 
     @PostMapping("/create/OwnershipTransfer")
@@ -28,5 +33,6 @@ public class OwnershipTransferController {
         return new ResponseEntity<>(ownershipTransferService.transferOwnership(createOwnershipTransferDto), HttpStatus.CREATED);
 
     }
+
 
 }

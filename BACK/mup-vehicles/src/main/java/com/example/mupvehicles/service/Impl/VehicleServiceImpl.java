@@ -3,14 +3,13 @@ package com.example.mupvehicles.service.Impl;
 import com.example.mupvehicles.dto.CreateVehicleDto;
 import com.example.mupvehicles.dto.VehicleDto;
 import com.example.mupvehicles.dto.VehicleSearchRequest;
+import com.example.mupvehicles.dto.VerifyVehicleAndOwnerDto;
 import com.example.mupvehicles.mapper.VehicleMapper;
 import com.example.mupvehicles.model.Owner;
 import com.example.mupvehicles.model.Vehicle;
 import com.example.mupvehicles.repository.OwnerRepository;
 import com.example.mupvehicles.repository.VehicleRepository;
 import com.example.mupvehicles.service.VehicleService;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -85,5 +84,49 @@ public class VehicleServiceImpl implements VehicleService {
 
     }
 
+    @Override
+    public String isVehicleStolen(String registration) {
+          Vehicle vehicle = vehicleRepository.findVehicleByRegistration(registration);
+
+          if (vehicle == null) {
+              return "Vehicle does not exist";
+          }
+
+          return vehicle.isStolen() ? "True" : "False";
+    }
+
+    @Override
+    public VehicleDto reportVehicleStolen(String registration) {
+
+        Vehicle vehicle = vehicleRepository.findVehicleByRegistration(registration);
+
+        if (vehicle == null) {
+            throw new RuntimeException("Vehicle does not exist");
+        }
+
+        vehicle.setStolen(true);
+        vehicleRepository.save(vehicle);
+        return vehicleMapper.converttoVehicleDto(vehicle);
+
+    }
+
+    @Override
+    public String verifyVehicleAndOwner(VerifyVehicleAndOwnerDto verifyVehicleAndOwnerDto) {
+        Vehicle vehicle = vehicleRepository.findVehicleByRegistration(verifyVehicleAndOwnerDto.getRegistration());
+
+        if (vehicle == null) {
+            return "Vehicle does not exist";
+        }
+
+        if (vehicle.isStolen()) {
+            return "Vehicle is reported as stolen";
+        }
+
+        if (vehicle.getOwner().getJmbg().equals(verifyVehicleAndOwnerDto.getJmbg())) {
+            return "All good, the vehicle belongs to the owner";
+        } else {
+            return "Vehicle does not belong to the owner, it may have been stolen";
+        }
+    }
 
 }

@@ -1,9 +1,14 @@
 package com.example.mupvehicles.mapper;
 
 import com.example.mupvehicles.dto.OwnershipTransferDto;
+import com.example.mupvehicles.dto.VehicleDto;
 import com.example.mupvehicles.model.OwnershipTransfer;
+import com.example.mupvehicles.model.Vehicle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class OwnerTransferMapper {
@@ -26,5 +31,11 @@ public class OwnerTransferMapper {
         ownershipTransferDto.setOwnerNew(ownerMapper.convertOwnerToOwnerDto(ownershipTransfer.getNewOwner()));
         ownershipTransferDto.setDateOfTransfer(ownershipTransfer.getDateOfTransfer());
         return ownershipTransferDto;
+    }
+
+    public List<OwnershipTransferDto> convertTransferOwnershipListToTransferOwnershipDtoList(List<OwnershipTransfer> ownershipTransferList) {
+        return ownershipTransferList.stream()
+                .map(this::convertTransferOwnershipToTransferOwnershipDto)
+                .collect(Collectors.toList());
     }
 }
