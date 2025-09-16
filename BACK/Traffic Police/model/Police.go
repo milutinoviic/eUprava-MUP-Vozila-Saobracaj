@@ -6,12 +6,12 @@ import (
 )
 
 type PolicePerson struct {
-	Id        string `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Rank      Rank   `json:"rank"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
+	Id        string `bson:"_id,omitempty" json:"id"`
+	FirstName string `bson:"first_name" json:"firstName"`
+	LastName  string `bson:"last_name" json:"lastName"`
+	Rank      Rank   `bson:"rank" json:"rank"`
+	Email     string `bson:"email" json:"email"`
+	Password  string `bson:"password" json:"password"`
 }
 
 type Police []*PolicePerson
@@ -30,6 +30,7 @@ func (p *PolicePerson) ToJSON(w io.Writer) error {
 }
 func (p *PolicePerson) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(p)
 }
 
@@ -39,5 +40,6 @@ func (p *Police) ToJSON(w io.Writer) error {
 }
 func (p *Police) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(p)
 }

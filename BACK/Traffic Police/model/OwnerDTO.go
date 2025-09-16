@@ -26,10 +26,12 @@ func (o *OwnerDTO) ToJSON(w io.Writer) error {
 
 func (o *OwnerDTO) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(o)
 }
 
 func (o *Owners) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(o)
 }

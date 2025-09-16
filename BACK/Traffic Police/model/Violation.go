@@ -7,15 +7,14 @@ import (
 )
 
 type Violation struct {
-	Id              string          `json:"id"`
-	TypeOfViolation TypeOfViolation `json:"type_of_violation"`
-	Date            time.Time       `json:"date"`
-	Location        string          `json:"location"`
-	DriverId        string          `json:"driver_id"`
-	VehicleId       string          `json:"vehicle_id"`
-	PoliceId        string          `json:"police_id"`
+	Id              string          `bson:"_id,omitempty" json:"id"`
+	TypeOfViolation TypeOfViolation `bson:"type_of_violation" json:"type_of_violation"`
+	Date            time.Time       `bson:"date" json:"date"`
+	Location        string          `bson:"location" json:"location"`
+	DriverId        string          `bson:"driver_id" json:"driver_id"`
+	VehicleId       string          `bson:"vehicle_id" json:"vehicle_id"`
+	PoliceId        string          `bson:"police_id,omitempty" json:"police_id,omitempty"`
 }
-
 type Violations []*Violation
 
 type TypeOfViolation string
@@ -33,6 +32,7 @@ func (v *Violation) ToJSON(w io.Writer) error {
 
 func (v *Violation) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(v)
 }
 
@@ -42,5 +42,6 @@ func (v *Violations) ToJSON(w io.Writer) error {
 }
 func (v *Violations) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(v)
 }

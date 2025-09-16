@@ -7,11 +7,11 @@ import (
 )
 
 type Fine struct {
-	Id          string    `json:"id"`
-	Amount      float64   `json:"amount"`
-	IsPaid      bool      `json:"isPaid"`
-	Date        time.Time `json:"date"`
-	ViolationID string    `json:"violationID"`
+	Id          string    `bson:"_id,omitempty" json:"id"`
+	Amount      float64   `bson:"amount" json:"amount"`
+	IsPaid      bool      `bson:"is_paid" json:"isPaid"`
+	Date        time.Time `bson:"date" json:"date"`
+	ViolationID string    `bson:"violation_id" json:"violationID"`
 }
 
 type Fines []*Fine
@@ -22,12 +22,14 @@ func (f *Fine) ToJSON(w io.Writer) error {
 }
 func (f *Fine) FromJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
+	e.DisallowUnknownFields()
 	return e.Decode(f)
 
 }
 
 func (f *Fines) FromJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
+	e.DisallowUnknownFields()
 	return e.Decode(f)
 }
 

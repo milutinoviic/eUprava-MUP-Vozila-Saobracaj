@@ -21,6 +21,7 @@ func (d *DriverIDDTO) ToJSON(w io.Writer) error {
 
 func (d *DriverIDDTO) FromJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
+	e.DisallowUnknownFields()
 	return e.Decode(d)
 }
 
@@ -31,5 +32,6 @@ func (d *DriverIDs) ToJSON(w io.Writer) error {
 
 func (d *DriverIDs) FromJSON(r io.Reader) error {
 	e := json.NewDecoder(r)
+	e.DisallowUnknownFields()
 	return e.Decode(d)
 }

@@ -27,10 +27,12 @@ func (v *Vehicles) ToJSON(w io.Writer) error {
 
 func (v *Vehicles) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(v)
 }
 
 func (v *VehicleDTO) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
+	d.DisallowUnknownFields()
 	return d.Decode(v)
 }
