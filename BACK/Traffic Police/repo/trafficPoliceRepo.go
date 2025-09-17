@@ -1,10 +1,13 @@
 package repo
 
 import (
+	"bytes"
 	"context"
 	"eUprava/trafficPolice/model"
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"github.com/jung-kurt/gofpdf"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -281,11 +284,11 @@ func (tp *TrafficPoliceRepo) assignOfficerToViolation(ctx context.Context, viola
 
 }
 
-func (tp *TrafficPoliceRepo) getAssignedViolations(ctx context.Context, officerId string) ([]*model.Violations, error) {
+func (tp *TrafficPoliceRepo) getAssignedViolations(ctx context.Context, officerId string) (model.Violations, error) {
 	ctx, span := tp.tracer.Start(ctx, "GetAssignedViolations")
 	defer span.End()
 	violationCollection := tp.getViolationCollection()
-	var violations []*model.Violations
+	var violations model.Violations
 	objId, _ := primitive.ObjectIDFromHex(officerId)
 	filter := bson.M{"police_id": objId}
 	cursor, err := violationCollection.Find(ctx, filter)
@@ -302,7 +305,7 @@ func (tp *TrafficPoliceRepo) getAssignedViolations(ctx context.Context, officerI
 	return violations, nil
 }
 
-func (tp *TrafficPoliceRepo) findUnpaidFinesByDriverID(ctx context.Context, driverId string) ([]*model.Fine, error) {
+func (tp *TrafficPoliceRepo) findUnpaidFinesByDriverID(ctx context.Context, driverId string) ([]model.Fine, error) {
 	ctx, span := tp.tracer.Start(ctx, "FindUnpaidFinesByDriverID")
 	defer span.End()
 
@@ -337,19 +340,19 @@ func (tp *TrafficPoliceRepo) findUnpaidFinesByDriverID(ctx context.Context, driv
 		return nil, err
 	}
 
-	fines := make([]*model.Fine, 0, len(results))
+	fines := make([]model.Fine, 0, len(results))
 	for _, r := range results {
 		f := r.Fine
-		fines = append(fines, &f)
+		fines = append(fines, f)
 	}
 
 	return fines, nil
 }
 
-func (tp *TrafficPoliceRepo) checkVehicleViolations(ctx context.Context, vehicleId string) ([]*model.Violations, error) {
+func (tp *TrafficPoliceRepo) checkVehicleViolations(ctx context.Context, vehicleId string) (model.Violations, error) {
 	ctx, span := tp.tracer.Start(ctx, "CheckVehicleViolations")
 	defer span.End()
-	var violations []*model.Violations
+	var violations model.Violations
 	violationCollection := tp.getViolationCollection()
 	filter := bson.M{"vehicle_id": vehicleId}
 	cursor, err := violationCollection.Find(ctx, filter)
@@ -367,11 +370,11 @@ func (tp *TrafficPoliceRepo) checkVehicleViolations(ctx context.Context, vehicle
 	return violations, nil
 }
 
-func (tp *TrafficPoliceRepo) getAllPolice(ctx context.Context) ([]*model.Police, error) {
+func (tp *TrafficPoliceRepo) getAllPolice(ctx context.Context) ([]model.Police, error) {
 	ctx, span := tp.tracer.Start(ctx, "GetAllPolice")
 	defer span.End()
 	policeCollection := tp.getPoliceCollection()
-	var polices []*model.Police
+	var polices []model.Police
 	cursor, err := policeCollection.Find(ctx, bson.M{})
 	if err != nil {
 		span.RecordError(err)
@@ -422,4 +425,229 @@ func (tp *TrafficPoliceRepo) getDailyStatisticsNoPipeline(ctx context.Context, p
 	})
 
 	return stats, nil
+}
+
+func (tp *TrafficPoliceRepo) markFineAsPaid(ctx context.Context, fineId string) error {
+	ctx, span := tp.tracer.Start(ctx, "MarkFineAsPaid")
+	defer span.End()
+	fines := tp.getFinesCollection()
+	objId, _ := primitive.ObjectIDFromHex(fineId)
+	_, err := fines.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": bson.M{"is_paid": true}})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return err
+	}
+	span.SetStatus(codes.Ok, "")
+	return nil
+}
+
+func (tp *TrafficPoliceRepo) promoteOfficer(ctx context.Context, officerId string) error {
+	ctx, span := tp.tracer.Start(ctx, "PromoteOfficer")
+	defer span.End()
+
+	objId, err := primitive.ObjectIDFromHex(officerId)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "invalid officerId")
+		return err
+	}
+
+	policeCollection := tp.getPoliceCollection()
+	var officer model.PolicePerson
+	err = policeCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&officer)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return err
+	}
+
+	switch officer.Rank {
+	case model.RankLow:
+		_, err = policeCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": bson.M{"rank": model.RankMedium}})
+	case model.RankMedium:
+		_, err = policeCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": bson.M{"rank": model.RankHigh}})
+	case model.RankHigh:
+		return errors.New("you can't promote this officer since they have the highest position")
+	}
+
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return err
+	}
+	span.SetStatus(codes.Ok, "")
+
+	return nil
+}
+
+func (tp *TrafficPoliceRepo) getViolationHistory(ctx context.Context, driverId string) (model.Violations, error) {
+	ctx, span := tp.tracer.Start(ctx, "GetViolationHistory")
+	defer span.End()
+	var violations model.Violations
+	filter := bson.M{"driver_id": driverId}
+	cursor, err := tp.getViolationCollection().Find(ctx, filter)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
+	}
+	if err = cursor.All(ctx, &violations); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
+	}
+	span.SetStatus(codes.Ok, "")
+	return violations, nil
+}
+func (tp *TrafficPoliceRepo) exportViolationData(ctx context.Context, format string, period string) ([]byte, error) {
+	ctx, span := tp.tracer.Start(ctx, "ExportViolationData")
+	defer span.End()
+	var violations model.Violations
+	start, end, err := parsePeriod(period)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
+	}
+
+	filter := bson.M{
+		"date": bson.M{
+			"$gte": start,
+			"$lte": end,
+		},
+	}
+	cursor, err := tp.getViolationCollection().Find(ctx, filter)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
+	}
+	if err = cursor.All(ctx, &violations); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
+	}
+
+	switch format {
+	case "csv":
+		return exportViolationsToCSV(violations)
+	case "pdf":
+		return exportViolationsToPDF(violations)
+	default:
+		return nil, fmt.Errorf("unsupported export format: %s", format)
+
+	}
+
+}
+
+func parsePeriod(period string) (time.Time, time.Time, error) {
+	now := time.Now()
+	switch period {
+	case "last7days":
+		return now.AddDate(0, 0, -7), now, nil
+
+	case "last30days":
+		return now.AddDate(0, 0, -30), now, nil
+
+	case "thisMonth":
+		start := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		end := start.AddDate(0, 1, -1)
+		return start, end, nil
+
+	case "last6months":
+		start := now.AddDate(0, -6, 0)
+		return start, now, nil
+
+	case "1year":
+		start := now.AddDate(-1, 0, 0)
+		return start, now, nil
+
+	default:
+
+		t, err := time.Parse("2006-01", period)
+		if err != nil {
+			return time.Time{}, time.Time{}, fmt.Errorf("invalid period: %s", period)
+		}
+		start := t
+		end := t.AddDate(0, 1, -1)
+		return start, end, nil
+	}
+
+}
+
+func exportViolationsToCSV(violations model.Violations) ([]byte, error) {
+	buf := &bytes.Buffer{}
+	writer := csv.NewWriter(buf)
+	writer.Write([]string{"ID", "Type", "Date", "Location", "DriverId", "VehicleId", "PoliceId"})
+
+	// rows
+	for _, v := range violations {
+		writer.Write([]string{
+			v.Id,
+			string(v.TypeOfViolation),
+			v.Date.Format("2006-01-02"),
+			v.Location,
+			v.DriverId,
+			v.VehicleId,
+			v.PoliceId,
+		})
+	}
+	writer.Flush()
+
+	return buf.Bytes(), writer.Error()
+}
+
+func exportViolationsToPDF(violations model.Violations) ([]byte, error) {
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 14)
+	pdf.Cell(40, 10, "Violation Report")
+
+	pdf.SetFont("Arial", "", 10)
+	pdf.Ln(12)
+
+	headers := []string{"ID", "Type", "Date", "Location", "DriverId", "VehicleId", "PoliceId"}
+	for _, h := range headers {
+		pdf.CellFormat(30, 7, h, "1", 0, "", false, 0, "")
+	}
+	pdf.Ln(-1)
+
+	for _, v := range violations {
+		row := []string{
+			v.Id,
+			string(v.TypeOfViolation),
+			v.Date.Format("2006-01-02"),
+			v.Location,
+			v.DriverId,
+			v.VehicleId,
+			v.PoliceId,
+		}
+		for _, col := range row {
+			pdf.CellFormat(30, 7, col, "1", 0, "", false, 0, "")
+		}
+		pdf.Ln(-1)
+	}
+
+	buf := &bytes.Buffer{}
+	err := pdf.Output(buf)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (tp *TrafficPoliceRepo) suspendOfficer(ctx context.Context, officerId string) error {
+	ctx, span := tp.tracer.Start(ctx, "suspendOfficer")
+	defer span.End()
+	policeCollection := tp.getPoliceCollection()
+	objId, _ := primitive.ObjectIDFromHex(officerId)
+	_, err := policeCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": bson.M{"is_suspended": true}})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return err
+	}
+	span.SetStatus(codes.Ok, "")
+	return nil
 }
