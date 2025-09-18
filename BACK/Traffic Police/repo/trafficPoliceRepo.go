@@ -268,7 +268,7 @@ func (tp *TrafficPoliceRepo) InsertViolation(ctx context.Context, violation *mod
 	return result.InsertedID.(primitive.ObjectID), nil
 }
 
-func (tp *TrafficPoliceRepo) assignOfficerToViolation(ctx context.Context, violationId, officerId string) error {
+func (tp *TrafficPoliceRepo) AssignOfficerToViolation(ctx context.Context, violationId, officerId string) error {
 	ctx, span := tp.tracer.Start(ctx, "AssignOfficerToViolation")
 	defer span.End()
 	violationCollection := tp.getViolationCollection()
@@ -284,7 +284,7 @@ func (tp *TrafficPoliceRepo) assignOfficerToViolation(ctx context.Context, viola
 
 }
 
-func (tp *TrafficPoliceRepo) getAssignedViolations(ctx context.Context, officerId string) (model.Violations, error) {
+func (tp *TrafficPoliceRepo) GetAssignedViolations(ctx context.Context, officerId string) (model.Violations, error) {
 	ctx, span := tp.tracer.Start(ctx, "GetAssignedViolations")
 	defer span.End()
 	violationCollection := tp.getViolationCollection()
@@ -305,7 +305,7 @@ func (tp *TrafficPoliceRepo) getAssignedViolations(ctx context.Context, officerI
 	return violations, nil
 }
 
-func (tp *TrafficPoliceRepo) findUnpaidFinesByDriverID(ctx context.Context, driverId string) ([]model.Fine, error) {
+func (tp *TrafficPoliceRepo) FindUnpaidFinesByDriverID(ctx context.Context, driverId string) (model.Fines, error) {
 	ctx, span := tp.tracer.Start(ctx, "FindUnpaidFinesByDriverID")
 	defer span.End()
 
@@ -340,16 +340,16 @@ func (tp *TrafficPoliceRepo) findUnpaidFinesByDriverID(ctx context.Context, driv
 		return nil, err
 	}
 
-	fines := make([]model.Fine, 0, len(results))
+	fines := make(model.Fines, 0, len(results))
 	for _, r := range results {
 		f := r.Fine
-		fines = append(fines, f)
+		fines = append(fines, &f)
 	}
 
 	return fines, nil
 }
 
-func (tp *TrafficPoliceRepo) checkVehicleViolations(ctx context.Context, vehicleId string) (model.Violations, error) {
+func (tp *TrafficPoliceRepo) CheckVehicleViolations(ctx context.Context, vehicleId string) (model.Violations, error) {
 	ctx, span := tp.tracer.Start(ctx, "CheckVehicleViolations")
 	defer span.End()
 	var violations model.Violations
@@ -370,27 +370,7 @@ func (tp *TrafficPoliceRepo) checkVehicleViolations(ctx context.Context, vehicle
 	return violations, nil
 }
 
-func (tp *TrafficPoliceRepo) getAllPolice(ctx context.Context) ([]model.Police, error) {
-	ctx, span := tp.tracer.Start(ctx, "GetAllPolice")
-	defer span.End()
-	policeCollection := tp.getPoliceCollection()
-	var polices []model.Police
-	cursor, err := policeCollection.Find(ctx, bson.M{})
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		return nil, err
-	}
-	if err = cursor.All(ctx, &polices); err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		return nil, err
-	}
-	span.SetStatus(codes.Ok, "")
-	return polices, nil
-}
-
-func (tp *TrafficPoliceRepo) getDailyStatisticsNoPipeline(ctx context.Context, policeId string) (model.StatisticsDTO, error) {
+func (tp *TrafficPoliceRepo) GetDailyStatistics(ctx context.Context, policeId string) (model.StatisticsDTO, error) {
 	ctx, span := tp.tracer.Start(ctx, "GetDailyStatisticsNoPipeline")
 	defer span.End()
 
@@ -427,7 +407,7 @@ func (tp *TrafficPoliceRepo) getDailyStatisticsNoPipeline(ctx context.Context, p
 	return stats, nil
 }
 
-func (tp *TrafficPoliceRepo) markFineAsPaid(ctx context.Context, fineId string) error {
+func (tp *TrafficPoliceRepo) MarkFineAsPaid(ctx context.Context, fineId string) error {
 	ctx, span := tp.tracer.Start(ctx, "MarkFineAsPaid")
 	defer span.End()
 	fines := tp.getFinesCollection()
@@ -442,7 +422,7 @@ func (tp *TrafficPoliceRepo) markFineAsPaid(ctx context.Context, fineId string) 
 	return nil
 }
 
-func (tp *TrafficPoliceRepo) promoteOfficer(ctx context.Context, officerId string) error {
+func (tp *TrafficPoliceRepo) PromoteOfficer(ctx context.Context, officerId string) error {
 	ctx, span := tp.tracer.Start(ctx, "PromoteOfficer")
 	defer span.End()
 
@@ -481,7 +461,7 @@ func (tp *TrafficPoliceRepo) promoteOfficer(ctx context.Context, officerId strin
 	return nil
 }
 
-func (tp *TrafficPoliceRepo) getViolationHistory(ctx context.Context, driverId string) (model.Violations, error) {
+func (tp *TrafficPoliceRepo) GetViolationHistory(ctx context.Context, driverId string) (model.Violations, error) {
 	ctx, span := tp.tracer.Start(ctx, "GetViolationHistory")
 	defer span.End()
 	var violations model.Violations
@@ -500,7 +480,7 @@ func (tp *TrafficPoliceRepo) getViolationHistory(ctx context.Context, driverId s
 	span.SetStatus(codes.Ok, "")
 	return violations, nil
 }
-func (tp *TrafficPoliceRepo) exportViolationData(ctx context.Context, format string, period string) ([]byte, error) {
+func (tp *TrafficPoliceRepo) ExportViolationData(ctx context.Context, format string, period string) ([]byte, error) {
 	ctx, span := tp.tracer.Start(ctx, "ExportViolationData")
 	defer span.End()
 	var violations model.Violations
@@ -637,7 +617,7 @@ func exportViolationsToPDF(violations model.Violations) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func (tp *TrafficPoliceRepo) suspendOfficer(ctx context.Context, officerId string) error {
+func (tp *TrafficPoliceRepo) SuspendOfficer(ctx context.Context, officerId string) error {
 	ctx, span := tp.tracer.Start(ctx, "suspendOfficer")
 	defer span.End()
 	policeCollection := tp.getPoliceCollection()
