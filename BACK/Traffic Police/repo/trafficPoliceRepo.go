@@ -166,7 +166,7 @@ func (tp *TrafficPoliceRepo) InsertPolicePerson(ctx context.Context, police *mod
 	return result.InsertedID.(primitive.ObjectID), nil
 }
 
-func (tp *TrafficPoliceRepo) NotifyPersonOfViolation(ctx context.Context, violation *model.Violation, driver model.OwnerDTO) error {
+func (tp *TrafficPoliceRepo) NotifyPersonOfViolation(ctx context.Context, violation model.Violation, driver model.OwnerDTO) error {
 	ctx, span := tp.tracer.Start(ctx, "NotifyPersonOfViolation")
 	defer span.End()
 
@@ -253,7 +253,7 @@ func (tp *TrafficPoliceRepo) NotifyPersonOfViolation(ctx context.Context, violat
 	return nil
 }
 
-func (tp *TrafficPoliceRepo) InsertViolation(ctx context.Context, violation *model.Violation) (primitive.ObjectID, error) {
+func (tp *TrafficPoliceRepo) InsertViolation(ctx context.Context, violation model.Violation) (primitive.ObjectID, error) {
 	ctx, span := tp.tracer.Start(ctx, "InsertViolation")
 	defer span.End()
 	violationCollection := tp.getViolationCollection()

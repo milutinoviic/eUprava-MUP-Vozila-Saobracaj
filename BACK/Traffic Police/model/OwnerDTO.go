@@ -6,9 +6,11 @@ import (
 )
 
 type OwnerDTO struct {
-	Jmbg      string `json:"jmbg"`
+	Id        string `json:"id"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
+	Address   string `json:"address"`
+	Jmbg      string `json:"jmbg"`
 	Email     string `json:"email"`
 }
 

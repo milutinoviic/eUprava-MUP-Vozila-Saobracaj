@@ -3,8 +3,10 @@ module eUprava/trafficPolice
 go 1.23.11
 
 require (
+	github.com/eapache/go-resiliency v1.7.0
 	github.com/gorilla/mux v1.8.1
 	github.com/jung-kurt/gofpdf v1.16.2
+	github.com/sony/gobreaker v1.0.0
 	go.mongodb.org/mongo-driver v1.17.4
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0

@@ -6,11 +6,14 @@ import (
 )
 
 type VehicleDTO struct {
-	Registration string `json:"registration"`
+	Id           string `json:"id"`
 	Mark         string `json:"mark"`
 	Model        string `json:"model"`
-	OwnerId      string `json:"ownerId"`
+	Registration string `json:"registration"`
+	Year         int    `json:"year"`
+	Color        string `json:"color"`
 	IsStolen     bool   `json:"isStolen"`
+	OwnerId      string `json:"ownerId"`
 }
 
 type Vehicles []*VehicleDTO
