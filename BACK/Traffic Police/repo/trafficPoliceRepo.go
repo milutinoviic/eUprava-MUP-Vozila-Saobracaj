@@ -27,7 +27,7 @@ type TrafficPoliceRepo struct {
 	tracer trace.Tracer
 }
 
-func NewTrafficPoliceRepo(cli *mongo.Client, logger *log.Logger, tracer trace.Tracer, ctx context.Context) (*TrafficPoliceRepo, error) {
+func NewTrafficPoliceRepo(logger *log.Logger, tracer trace.Tracer, ctx context.Context) (*TrafficPoliceRepo, error) {
 	dbUri := os.Getenv("MONGO_DB_URI")
 	if dbUri == "" {
 		return nil, errors.New("env MONGO_DB_URI is not set")

@@ -45,6 +45,14 @@ type TrafficPoliceHandler struct {
 	tracer trace.Tracer
 }
 
+func NewTrafficPoliceHandler(logger *log.Logger, repo *repo.TrafficPoliceRepo, tracer trace.Tracer) *TrafficPoliceHandler {
+	return &TrafficPoliceHandler{
+		logger: logger,
+		repo:   repo,
+		tracer: tracer,
+	}
+}
+
 func ExtractTraceInfoMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := otel.GetTextMapPropagator().Extract(r.Context(), propagation.HeaderCarrier(r.Header))
@@ -136,18 +144,10 @@ func (tp *TrafficPoliceHandler) HandleGettingViolationsByOfficer(rw http.Respons
 	ctx, span := tp.tracer.Start(r.Context(), "HandleGettingViolationsByOfficer")
 	defer span.End()
 
-	res := struct {
-		OfficerId string `json:"officerId"`
-	}{}
-	err := json.NewDecoder(r.Body).Decode(&res)
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-		return
-	}
+	vars := mux.Vars(r)
+	id := vars["officerId"]
 
-	v, err := tp.repo.GetAssignedViolations(ctx, res.OfficerId)
+	v, err := tp.repo.GetAssignedViolations(ctx, id)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
@@ -238,20 +238,13 @@ func (tp *TrafficPoliceHandler) HandleDailyStatistics(rw http.ResponseWriter, r 
 }
 
 func (tp *TrafficPoliceHandler) HandleOfficerPromotion(rw http.ResponseWriter, r *http.Request) {
-	ctx, span := tp.tracer.Start(r.Context(), "HandleDailyStatistics")
+	ctx, span := tp.tracer.Start(r.Context(), "HandleOfficerPromotion")
 	defer span.End()
-	res := struct {
-		PoliceId string `json:"policeId"`
-	}{}
-	err := json.NewDecoder(r.Body).Decode(&res)
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-		return
-	}
 
-	err = tp.repo.PromoteOfficer(ctx, res.PoliceId)
+	vars := mux.Vars(r)
+	id := vars["policeId"]
+
+	err := tp.repo.PromoteOfficer(ctx, id)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
@@ -263,18 +256,11 @@ func (tp *TrafficPoliceHandler) HandleOfficerPromotion(rw http.ResponseWriter, r
 func (tp *TrafficPoliceHandler) HandleViolationHistory(rw http.ResponseWriter, r *http.Request) {
 	ctx, span := tp.tracer.Start(r.Context(), "HandleViolationHistory")
 	defer span.End()
-	res := struct {
-		DriverId string `json:"driverId"`
-	}{}
-	err := json.NewDecoder(r.Body).Decode(&res)
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-		return
-	}
 
-	d, err := tp.repo.GetViolationHistory(ctx, res.DriverId)
+	vars := mux.Vars(r)
+	driverId := vars["driverId"]
+
+	d, err := tp.repo.GetViolationHistory(ctx, driverId)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
@@ -332,20 +318,12 @@ func (tp *TrafficPoliceHandler) HandleExportViolations(rw http.ResponseWriter, r
 }
 
 func (tp *TrafficPoliceHandler) HandleOfficerSuspension(rw http.ResponseWriter, r *http.Request) {
-	ctx, span := tp.tracer.Start(r.Context(), "HandleDailyStatistics")
+	ctx, span := tp.tracer.Start(r.Context(), "HandleOfficerSuspension")
 	defer span.End()
-	res := struct {
-		PoliceId string `json:"policeId"`
-	}{}
-	err := json.NewDecoder(r.Body).Decode(&res)
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusBadRequest)
-		return
-	}
+	vars := mux.Vars(r)
+	policeId := vars["policeId"]
 
-	err = tp.repo.SuspendOfficer(ctx, res.PoliceId)
+	err := tp.repo.SuspendOfficer(ctx, policeId)
 	if err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
@@ -592,6 +570,252 @@ func (tp *TrafficPoliceHandler) HandleQuestionAboutVehicle(rw http.ResponseWrite
 		"message": message,
 	})
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (tp *TrafficPoliceHandler) ReportVehicleAsStolen(rw http.ResponseWriter, r *http.Request) {
+	ctx, span := tp.tracer.Start(r.Context(), "ReportVehicleAsStolen")
+	defer span.End()
+	vars := mux.Vars(r)
+	registration := vars["registration"]
+	projectUrl := os.Getenv("LINK_TO_MUP_SERVICE")
+	url := fmt.Sprintf("%s/vehicles/%s/report-stolen", projectUrl, registration)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, nil)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	client, err := createTLSClient()
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	resp, err := tp.executeReqToMUP(ctx, req, client, "ReportVehicleAsStolen")
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, err.Error())
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}(resp.Body)
+	var dto model.VehicleDTO
+	if err := json.NewDecoder(resp.Body).Decode(&dto); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	rw.Header().Set(contentType, appJson)
+	rw.WriteHeader(http.StatusOK)
+	if err = dto.ToJSON(rw); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+
+}
+
+func (tp *TrafficPoliceHandler) VerifyVehicleWithOwner(rw http.ResponseWriter, r *http.Request) {
+	ctx, span := tp.tracer.Start(r.Context(), "VerifyVehicleWithOwner")
+	defer span.End()
+	st := struct {
+		Registration string `json:"registration"`
+		Jmbg         string `json:"jmbg"`
+	}{}
+	if err := json.NewDecoder(r.Body).Decode(&st); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	projectUrl := os.Getenv("LINK_TO_MUP_SERVICE")
+	url := fmt.Sprintf("%s/vehicles/verify", projectUrl)
+	v, err := json.Marshal(st)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(v))
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	client, err := createTLSClient()
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	resp, err := tp.executeReqToMUP(ctx, req, client, "VerifyVehicleWithOwner")
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	raw := strings.TrimSpace(string(bodyBytes))
+
+	var message string
+	switch raw {
+	case "Vehicle is reported as stolen":
+		message = "Vehicle is reported as stolen"
+	case "Vehicle does not belong to the owner, it may have been stolen":
+		message = "Vehicle does not belong to the owner, it may have been stolen"
+	case "Vehicle does not exist":
+		message = "Vehicle does not exist"
+	case "All good, the vehicle belongs to the owner":
+		message = "All good, the vehicle belongs to the owner"
+	default:
+		message = "Unknown response from vehicle service"
+	}
+
+	rw.Header().Set("Content-Type", "application/json")
+	rw.WriteHeader(http.StatusOK)
+	err = json.NewEncoder(rw).Encode(map[string]string{
+		"message": message,
+	})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func (tp *TrafficPoliceHandler) GetOwnershipHistoryForInvestigation(rw http.ResponseWriter, r *http.Request) {
+	ctx, span := tp.tracer.Start(r.Context(), "GetOwnershipHistoryForInvitation")
+	defer span.End()
+	vars := mux.Vars(r)
+	registration := vars["registration"]
+	projectUrl := os.Getenv("LINK_TO_MUP_SERVICE")
+	url := fmt.Sprintf("%s/ownerTransfers/getOwnershipTransferForVehicle/%s", projectUrl, registration)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	client, err := createTLSClient()
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	resp, err := tp.executeReqToMUP(ctx, req, client, "GetOwnershipHistoryForInvitation")
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	var d dto2.OwnershipTransferDto
+	if err := d.FromJSON(resp.Body); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	rw.Header().Set(contentType, appJson)
+	rw.WriteHeader(http.StatusOK)
+	if err := d.ToJSON(rw); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+}
+
+func (tp *TrafficPoliceHandler) SearchVehicleByOptional(rw http.ResponseWriter, r *http.Request) {
+	ctx, span := tp.tracer.Start(r.Context(), "SearchVehicleByOptional")
+	defer span.End()
+	st := struct {
+		Mark         string `json:"mark,omitempty"`
+		Model        string `json:"model,omitempty"`
+		Color        string `json:"color,omitempty"`
+		Registration string `json:"registration,omitempty"`
+	}{}
+	if err := json.NewDecoder(r.Body).Decode(&st); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	projectUrl := os.Getenv("LINK_TO_MUP_SERVICE")
+	url := fmt.Sprintf("%s/vehicles/search", projectUrl)
+	client, err := createTLSClient()
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	v, err := json.Marshal(st)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(v))
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	resp, err := tp.executeReqToMUP(ctx, req, client, "SearchVehicleByOptional")
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	var d model.Vehicles
+	if err = d.FromJSON(resp.Body); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		http.Error(rw, err.Error(), http.StatusBadRequest)
+		return
+	}
+	rw.Header().Set("Content-Type", "application/json")
+	rw.WriteHeader(http.StatusOK)
+	if err = d.ToJSON(rw); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
