@@ -4,6 +4,8 @@ import (
 	"context"
 	"eUprava/trafficPolice/handler"
 	"eUprava/trafficPolice/repo"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -13,11 +15,26 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
+)
+
+type VerifyResponse struct {
+	Ok    bool   `json:"ok"`
+	Email string `json:"email,omitempty"`
+	Role  string `json:"role,omitempty"`
+}
+
+type contextKey string
+
+const (
+	ContextEmail contextKey = "email"
+	ContextRole  contextKey = "role"
 )
 
 func main() {
@@ -74,6 +91,9 @@ func main() {
 	router.HandleFunc("/police/promotion/{policeId}", ph.HandleOfficerPromotion).Methods(http.MethodPatch)
 	router.HandleFunc("/police/suspend/{policeId}", ph.HandleOfficerSuspension).Methods(http.MethodPatch)
 
+	router.Use(func(next http.Handler) http.Handler {
+		return AuthMiddleware("http://auth-service:8080")(next)
+	})
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -92,9 +112,8 @@ func main() {
 	}
 	logger.Println("Starting server on port", config["address"])
 	go func() {
-		err := server.ListenAndServeTLS("/app/cert.crt", "/app/privat.key")
-		if err != nil {
-			logger.Fatal(err)
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
 		}
 	}()
 
@@ -141,4 +160,60 @@ func loadConfig() map[string]string {
 	config := make(map[string]string)
 	config["address"] = fmt.Sprintf(":%s", os.Getenv("PORT"))
 	return config
+}
+
+func AuthMiddleware(authServiceURL string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authHeader := r.Header.Get("Authorization")
+			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+				writeJSONError(w, http.StatusUnauthorized, "Missing or invalid Authorization header")
+				return
+			}
+			token := strings.TrimPrefix(authHeader, "Bearer ")
+
+			client := &http.Client{Timeout: 10 * time.Second}
+			req, err := http.NewRequest(http.MethodGet, authServiceURL+"/auth/verify", nil)
+			if err != nil {
+				writeJSONError(w, http.StatusInternalServerError, "Internal error creating request")
+				return
+			}
+			req.Header.Set("Authorization", "Bearer "+token)
+
+			resp, err := client.Do(req)
+			if err != nil {
+				writeJSONError(w, http.StatusUnauthorized, "Auth service unreachable: "+err.Error())
+				return
+			}
+			defer resp.Body.Close()
+
+			if resp.StatusCode != http.StatusOK {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(resp.StatusCode)
+				io.Copy(w, resp.Body)
+				return
+			}
+
+			var verify VerifyResponse
+			if err := json.NewDecoder(resp.Body).Decode(&verify); err != nil {
+				writeJSONError(w, http.StatusUnauthorized, "Invalid response from auth service")
+				return
+			}
+
+			if !verify.Ok {
+				writeJSONError(w, http.StatusUnauthorized, "Token not valid")
+				return
+			}
+
+			ctx := context.WithValue(r.Context(), ContextEmail, verify.Email)
+			ctx = context.WithValue(ctx, ContextRole, verify.Role)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
+}
+
+func writeJSONError(w http.ResponseWriter, status int, msg string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(map[string]string{"error": msg})
 }

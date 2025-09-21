@@ -3,8 +3,6 @@ package handler
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"eUprava/trafficPolice/domain"
 	dto2 "eUprava/trafficPolice/dto"
 	"eUprava/trafficPolice/model"
@@ -19,7 +17,6 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -356,20 +353,17 @@ func (tp *TrafficPoliceHandler) HandleGettingPolice(rw http.ResponseWriter, r *h
 }
 
 func (tp *TrafficPoliceHandler) fetchAllDrivers(ctx context.Context) (model.Owners, error) {
-	clientToDo, err := createTLSClient()
-	if err != nil {
-		return nil, fmt.Errorf("error creating TLS client: %w", err)
-	}
+	client := &http.Client{}
 
 	projectUrl := os.Getenv("LINK_TO_MUP_SERVICE")
 	ownerService := fmt.Sprintf("%s/owners", projectUrl)
 
-	req, err := http.NewRequestWithContext(ctx, "GET", ownerService, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, ownerService, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to build request: %w", err)
 	}
 
-	resp, err := tp.executeReqToMUP(ctx, req, clientToDo, "fetchAllDrivers")
+	resp, err := tp.executeReqToMUP(ctx, req, client, "fetchAllDrivers")
 	if err != nil {
 		return nil, err
 	}
@@ -455,30 +449,6 @@ func (tp *TrafficPoliceHandler) createCircuitBreaker(name string) *gobreaker.Cir
 	)
 }
 
-func createTLSClient() (*http.Client, error) {
-	caCert, err := ioutil.ReadFile("/app/cert.crt")
-	if err != nil {
-		return nil, err
-	}
-
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-
-	tlsConfig := &tls.Config{
-		RootCAs: caCertPool,
-	}
-
-	transport := &http.Transport{
-		TLSClientConfig: tlsConfig,
-	}
-
-	client := &http.Client{
-		Transport: transport,
-	}
-
-	return client, nil
-}
-
 func (tp *TrafficPoliceHandler) HandleDriverSuspension(ctx context.Context, dto dto2.SuspendDriverIdRequest) (model.Owners, error) {
 	ctx, span := tp.tracer.Start(ctx, "HandleDriverSuspension")
 	defer span.End()
@@ -500,12 +470,8 @@ func (tp *TrafficPoliceHandler) HandleDriverSuspension(ctx context.Context, dto 
 		return nil, err
 	}
 	req.Header.Set(contentType, appJson)
-	client, err := createTLSClient()
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		return nil, err
-	}
+
+	client := &http.Client{}
 	_, err = tp.executeReqToMUP(ctx, req, client, "HandleDriverSuspension")
 	if err != nil {
 		span.RecordError(err)
@@ -515,14 +481,16 @@ func (tp *TrafficPoliceHandler) HandleDriverSuspension(ctx context.Context, dto 
 
 	return tp.fetchAllDrivers(ctx)
 }
-
 func (tp *TrafficPoliceHandler) HandleQuestionAboutVehicle(rw http.ResponseWriter, r *http.Request) {
 	ctx, span := tp.tracer.Start(r.Context(), "HandleQuestionAboutVehicle")
 	defer span.End()
+
 	vars := mux.Vars(r)
 	registration := vars["registration"]
+
 	projectUrl := os.Getenv("LINK_TO_MUP_SERVICE")
 	url := fmt.Sprintf("%s/vehicles/isStolen/%s", projectUrl, registration)
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		span.RecordError(err)
@@ -530,13 +498,8 @@ func (tp *TrafficPoliceHandler) HandleQuestionAboutVehicle(rw http.ResponseWrite
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	client, err := createTLSClient()
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
+
+	client := &http.Client{}
 	resp, err := tp.executeReqToMUP(ctx, req, client, "HandleQuestionAboutVehicle")
 	if err != nil {
 		span.RecordError(err)
@@ -545,6 +508,7 @@ func (tp *TrafficPoliceHandler) HandleQuestionAboutVehicle(rw http.ResponseWrite
 		return
 	}
 	defer resp.Body.Close()
+
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -566,10 +530,7 @@ func (tp *TrafficPoliceHandler) HandleQuestionAboutVehicle(rw http.ResponseWrite
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusOK)
-	err = json.NewEncoder(rw).Encode(map[string]string{
-		"message": message,
-	})
-	if err != nil {
+	if err := json.NewEncoder(rw).Encode(map[string]string{"message": message}); err != nil {
 		span.RecordError(err)
 		span.SetStatus(codes.Error, err.Error())
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -591,13 +552,7 @@ func (tp *TrafficPoliceHandler) ReportVehicleAsStolen(rw http.ResponseWriter, r 
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	client, err := createTLSClient()
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	client := &http.Client{}
 	resp, err := tp.executeReqToMUP(ctx, req, client, "ReportVehicleAsStolen")
 	if err != nil {
 		span.RecordError(err)
@@ -662,13 +617,7 @@ func (tp *TrafficPoliceHandler) VerifyVehicleWithOwner(rw http.ResponseWriter, r
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	client, err := createTLSClient()
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	client := &http.Client{}
 	resp, err := tp.executeReqToMUP(ctx, req, client, "VerifyVehicleWithOwner")
 	if err != nil {
 		span.RecordError(err)
@@ -726,13 +675,8 @@ func (tp *TrafficPoliceHandler) GetOwnershipHistoryForInvestigation(rw http.Resp
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	client, err := createTLSClient()
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	client := &http.Client{}
+
 	resp, err := tp.executeReqToMUP(ctx, req, client, "GetOwnershipHistoryForInvitation")
 	if err != nil {
 		span.RecordError(err)
@@ -777,13 +721,7 @@ func (tp *TrafficPoliceHandler) SearchVehicleByOptional(rw http.ResponseWriter, 
 
 	projectUrl := os.Getenv("LINK_TO_MUP_SERVICE")
 	url := fmt.Sprintf("%s/vehicles/search", projectUrl)
-	client, err := createTLSClient()
-	if err != nil {
-		span.RecordError(err)
-		span.SetStatus(codes.Error, err.Error())
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	client := &http.Client{}
 	v, err := json.Marshal(st)
 	if err != nil {
 		span.RecordError(err)
