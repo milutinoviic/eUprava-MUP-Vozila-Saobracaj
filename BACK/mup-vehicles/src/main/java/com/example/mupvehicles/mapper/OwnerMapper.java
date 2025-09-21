@@ -4,6 +4,9 @@ import com.example.mupvehicles.dto.OwnerDto;
 import com.example.mupvehicles.model.Owner;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class OwnerMapper {
 
@@ -20,5 +23,11 @@ public class OwnerMapper {
 
         return ownerDto;
 
+    }
+
+    public List<OwnerDto> convertOwnersToOwnerDtos(List<Owner> owners) {
+        return owners.stream()
+                .map(this::convertOwnerToOwnerDto)
+                .collect(Collectors.toList());
     }
 }

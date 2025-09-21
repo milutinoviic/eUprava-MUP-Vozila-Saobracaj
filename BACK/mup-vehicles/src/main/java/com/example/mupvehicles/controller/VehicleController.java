@@ -25,13 +25,13 @@ public class VehicleController {
     }
 
     @GetMapping("/getVehiclesByRegistration/{jmbg}")
-    public ResponseEntity<List<VehicleDto>> getAllVehiclesByOwnerJmbg(@PathVariable String jmbg) {
+    public ResponseEntity<List<VehicleDto>> findAllVehiclesByOwnerJmbg(@PathVariable String jmbg) {
         return new ResponseEntity<>(vehicleService.findAllVehiclesByOwnerJmbg(jmbg), HttpStatus.OK);
     }
 
-    @GetMapping("/isStolen/{id}")
-    public String isStolen(@PathVariable String id) {
-        return vehicleService.isVehicleStolen(id);
+    @GetMapping("/isStolen/{registration}")
+    public String isStolen(@PathVariable String registration) {
+        return vehicleService.isVehicleStolen(registration);
     }
 
     @PostMapping("/search")

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/owners")
 public class OwnerController {
@@ -17,6 +19,11 @@ public class OwnerController {
     @Autowired
     public OwnerController(OwnerService ownerService) {
         this.ownerService = ownerService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OwnerDto>> findAllOwners() {
+        return new ResponseEntity<>(ownerService.getAllOwners(),HttpStatus.OK);
     }
 
     @GetMapping("/{registration}")
@@ -34,5 +41,6 @@ public class OwnerController {
         ownerService.deleteOwner(id);
         return ResponseEntity.ok().build();
     }
+
 
 }

@@ -103,4 +103,10 @@ public class OwnerServiceImpl implements OwnerService {
         ownerRepository.delete(owner);
     }
 
+    @Override
+    public List<OwnerDto> getAllOwners(){
+        List<Owner> ownerList = ownerRepository.findAll();
+        return  ownerMapper.convertOwnersToOwnerDtos(ownerList);
+    }
+
 }
