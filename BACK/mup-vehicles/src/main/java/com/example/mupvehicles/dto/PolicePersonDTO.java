@@ -10,5 +10,4 @@ public class PolicePersonDTO {
     private String rank;
     private boolean isSuspended;
     private String email;
-    private String password;
 }
