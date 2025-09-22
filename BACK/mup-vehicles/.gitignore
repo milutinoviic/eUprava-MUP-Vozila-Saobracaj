@@ -34,7 +34,7 @@ build/
 
 ### Docker ###
 Dockerfile
-docker-compose.yml
-docker-compose*.yml
-.env
+../docker-compose.yml
+../docker-compose.yml
+../.env
 data.sql

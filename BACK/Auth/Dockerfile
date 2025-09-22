@@ -1,5 +1,6 @@
 # Build stage
-FROM golang:1.21-alpine AS build
+FROM golang:1.23.11-alpine AS build
+
 WORKDIR /app
 
 # Install git (needed if your modules require it)
@@ -19,6 +20,8 @@ WORKDIR /app
 
 # Copy the binary
 COPY --from=build /app/server .
+
+RUN chmod +x /app/server
 
 # Expose port
 EXPOSE 8090

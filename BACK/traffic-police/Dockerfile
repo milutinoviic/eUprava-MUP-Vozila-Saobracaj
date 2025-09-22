@@ -1,5 +1,6 @@
 # Build stage
-FROM golang:1.21-alpine AS build
+FROM golang:1.23.11-alpine AS build
+
 WORKDIR /app
 
 # Install git (needed for module dependencies)
@@ -19,6 +20,8 @@ WORKDIR /app
 
 # Copy the binary from the build stage
 COPY --from=build /app/traffic-police .
+
+RUN chmod +x /app/traffic-police
 
 # Expose the port your service listens on (example: 8081)
 EXPOSE 8081
