@@ -78,6 +78,12 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
         repo.promoteOfficer(officerId);
     }
 
+    @Override
+    public PolicePerson.Rank getRankOfOfficer(String officerId) {
+        PolicePerson person = repo.getPoliceById(officerId);
+        return person.getRank();
+    }
+
     // ------------------ FINES ------------------
     @Override
     public List<Fine> getAllFines() {

@@ -1,5 +1,6 @@
 package com.example.traffic_police.controller;
 
+import com.example.traffic_police.dto.PoliceDTO;
 import com.example.traffic_police.model.PolicePerson;
 import com.example.traffic_police.model.StatisticDTO;
 import com.example.traffic_police.service.TrafficPoliceService;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,14 +21,24 @@ public class PoliceController {
 
 
     @GetMapping
-    public ResponseEntity<List<PolicePerson>> GetAllPolice() {
-        return ResponseEntity.ok(trafficPoliceService.getAllPolice());
+    public ResponseEntity<List<PoliceDTO>> GetAllPolice() {
+        List<PoliceDTO> dto = new ArrayList<>();
+        List<PolicePerson> people = trafficPoliceService.getAllPolice();
+        for (PolicePerson p : people) {
+            dto.add(new PoliceDTO(p));
+        }
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
     public ResponseEntity<PolicePerson> AddPolice(@RequestBody PolicePerson p) {
         PolicePerson inserted = trafficPoliceService.insertPolicePerson(p);
         return ResponseEntity.ok(inserted);
+    }
+
+    @GetMapping("/rank/{id}")
+    public ResponseEntity<PolicePerson.Rank> GetPoliceRank(@PathVariable String id) {
+        return ResponseEntity.ok(trafficPoliceService.getRankOfOfficer(id));
     }
 
     @PatchMapping("/suspend/{id}")

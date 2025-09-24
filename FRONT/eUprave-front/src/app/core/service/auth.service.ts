@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthRequest, AuthResponse } from '../type/auth.types';
+import {AuthRequest, AuthResponse, AuthUser} from '../type/auth.types';
 import { Observable } from 'rxjs';
+import {RoutesService} from './routes.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +11,7 @@ export class AuthService {
 
   private authUrl = 'http://localhost:8080/login';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private routes: RoutesService) { }
 
   signIn(authRequest: AuthRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(this.authUrl, authRequest);
@@ -25,11 +26,11 @@ export class AuthService {
   }
 
   isLoggedIn():boolean {
-    if(!localStorage.getItem("authToken")){
-      return false;
-    }
+    return localStorage.getItem("authToken") != null;
+  }
 
-    return true;
+  register(authUser: AuthUser): Observable<any> {
+    return this.http.post(this.routes.AUTH_REGISTER, authUser);
   }
 
 

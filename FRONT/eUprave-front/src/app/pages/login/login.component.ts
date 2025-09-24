@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { AuthRequest } from '../../core/type/auth.types';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/service/auth.service';
@@ -13,7 +13,7 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup;
   loading = false;
@@ -48,14 +48,14 @@ export class LoginComponent {
         this.loading = false;
 
         if (res.token) {
-        
+
           this.authService.setToken(res.token);
           this.errorMessage = '';
           alert("Login successful!")
           console.log('Login successful!');
           this.router.navigate(["/home"]);
         } else {
-        
+
           console.log(this.errorMessage)
           alert(this.errorMessage)
         }

@@ -1,0 +1,9 @@
+
+<div *ngIf="currentSection" (click)="goBack()">
+  <p>Go back <i class="arrow left"></i></p>
+</div>
+
+
+<div *ngIf="currentSection === 'police'">
+  <app-police-list></app-police-list>
+</div>

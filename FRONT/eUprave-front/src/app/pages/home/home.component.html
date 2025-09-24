@@ -1,0 +1,12 @@
+<div class="button-container" *ngIf="role == 'POLICE'">
+  <button class="btn btn-1" (click)="goTo('fines')">Fines</button>
+  <button class="btn btn-2" (click)="goTo('owners')">Owners</button>
+  <button class="btn btn-3" *ngIf="rank == Rank.HIGH" (click)="goTo('police')">Police</button>
+  <button class="btn btn-4" (click)="goTo('vehicles')">Vehicles</button>
+  <button class="btn btn-5" (click)="goTo('violations')">Violations</button>
+</div>
+
+
+<div>
+
+</div>

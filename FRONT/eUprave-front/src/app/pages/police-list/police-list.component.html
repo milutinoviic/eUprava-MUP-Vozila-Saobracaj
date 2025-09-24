@@ -1,0 +1,49 @@
+<div class="police-list-root">
+  <div class="toolbar">
+    <input type="search" placeholder="Search officers or rank..." [(ngModel)]="query" />
+    <button class="refresh" (click)="fetchPolice()" title="Refresh">⟳</button>
+  </div>
+
+  <div *ngIf="loading" class="info">Loading officers...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div class="cards-grid">
+    <ng-container *ngFor="let p of filteredPolice(); trackBy: trackById">
+      <article class="card">
+        <div class="avatar" [attr.aria-label]="fullName(p)">
+          <span class="initials">{{ p.firstName?.charAt(0) }}{{ p.lastName?.charAt(0) }}</span>
+        </div>
+
+        <div class="card-body">
+          <h3 class="name">{{ p.firstName }} <span class="last">{{ p.lastName }}</span></h3>
+          <div class="meta">
+            <span class="rank-badge" [ngClass]="rankClass(p.rank)">
+              {{ rankLabel(p.rank) }}
+            </span>
+            <small class="id-note" aria-hidden="true"></small>
+          </div>
+
+          <p class="actions">
+            <button class="btn small" (click)="suspendPolice(p.id)">Suspend</button>
+            <button class="btn small ghost" (click)="promotePolice(p.id)">Promote</button>
+            <button class="btn small ghost" (click)="seeStatistics(p.id)">See statistics</button>
+          </p>
+        </div>
+      </article>
+    </ng-container>
+  </div>
+
+  <div *ngIf="!loading && police.length === 0" class="info">No officers found.</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-window" (click)="$event.stopPropagation()">
+    <h2>Officer Statistics</h2>
+    <canvas baseChart
+            [data]="chartData"
+            [type]="'line'">
+    </canvas>
+    <button class="close-btn" (click)="closeModal()">Close</button>
+  </div>
+</div>

@@ -15,6 +15,7 @@ public interface TrafficPoliceService {
     PolicePerson insertPolicePerson(PolicePerson police);
     void suspendOfficer(String officerId);
     void promoteOfficer(String officerId);
+    PolicePerson.Rank getRankOfOfficer(String officerId);
 
     // ------------------ FINES ------------------
     List<Fine> getAllFines();

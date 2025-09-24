@@ -37,6 +37,10 @@ public class TrafficPoliceRepo {
         return mongoTemplate.findAll(PolicePerson.class);
     }
 
+    public PolicePerson getPoliceById(String id) {
+        return mongoTemplate.findById(id, PolicePerson.class);
+    }
+
     public PolicePerson insertPolicePerson(PolicePerson police) {
         if (police.getRank() == null) {
             police.setRank(PolicePerson.Rank.LOW);
