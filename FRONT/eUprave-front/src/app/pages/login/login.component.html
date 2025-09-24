@@ -1,0 +1,24 @@
+<div class="login-container">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input id="email" type="email" formControlName="email" />
+      <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="error">
+        <small *ngIf="loginForm.get('email')?.errors?.['required']">Email nije validan.</small>
+        <small *ngIf="loginForm.get('email')?.errors?.['email']">Email nije validan format.</small>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input id="password" type="password" formControlName="password" />
+      <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error">
+        <small *ngIf="loginForm.get('password')?.errors?.['required']">Password nije validan.</small>
+        <small *ngIf="loginForm.get('password')?.errors?.['minlength']">Password mora imati minimum 6 karaktera.</small>
+      </div>
+    </div>
+
+    <button type="submit">Login</button>
+
+  </form>
+</div>
