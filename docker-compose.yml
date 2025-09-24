@@ -1,0 +1,114 @@
+networks:
+  app_network:
+
+services:
+  mup-vehicles:
+    container_name: mup-vehicles
+    build:
+      context: ./BACK/mup-vehicles
+      dockerfile: Dockerfile
+    image: mup-vehicles:latest
+    env_file:
+      - .env
+    ports:
+      - ${VEHICLES_SERVICE_PORT}
+    environment:
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    depends_on:
+      - db
+      - mongo
+    networks:
+      - app_network
+    volumes:
+      - vehicles_data:/app/data
+
+  auth:
+    container_name: auth
+    build:
+      context: ./BACK/Auth
+      dockerfile: Dockerfile
+    restart: always
+    image: auth:latest
+    env_file:
+      - .env
+    ports:
+      - ${SERVER_SERVICE_PORT}
+    depends_on:
+      - mongo-auth
+    networks:
+      - app_network
+    volumes:
+      - auth_data:/app/data
+
+  traffic-police-service:
+    container_name: traffic-police-service
+    build:
+      context: ./BACK/traffic-police
+      dockerfile: Dockerfile
+    image: traffic-police-service:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${TRAFFIC_POLICE_SERVICE_PORT}
+    depends_on:
+      - mongo
+    networks:
+      - app_network
+    volumes:
+      - traffic_data:/app/data
+
+  db:
+    container_name: postgres-db
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=${SPRING_DATASOURCE_USERNAME}
+      - POSTGRES_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_DB_PORT}
+    networks:
+      - app_network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongo:
+    container_name: mongo
+    image: mongo:6
+    restart: always
+    ports:
+      - ${MONGO_DB_PORT}
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DB}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    networks:
+      - app_network
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-auth:
+    container_name: mongo-auth
+    image: mongo:6 
+    restart: always
+    ports:
+      - ${MONGO_AUTH_PORT}
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_DB_AUTH}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    networks:
+      - app_network
+    volumes:
+      - mongoAuth_data:/data/db
+
+
+volumes:
+  mongoAuth_data:
+  mongo_data:
+  postgres_data:
+  vehicles_data:
+  auth_data:
+  traffic_data:

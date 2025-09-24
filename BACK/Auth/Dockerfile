@@ -1,30 +1,11 @@
-# Build stage
-FROM golang:1.23.11-alpine AS build
-
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Install git (needed if your modules require it)
-RUN apk add --no-cache git
-
-# Cache dependencies
-COPY go.mod go.sum ./
-RUN go mod download
-
-# Copy source and build
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o server .
-
-# Final stage
-FROM alpine:latest
+FROM eclipse-temurin:21-jdk-jammy
 WORKDIR /app
-
-# Copy the binary
-COPY --from=build /app/server .
-
-RUN chmod +x /app/server
-
-# Expose port
-EXPOSE 8090
-
-# Run the binary
-ENTRYPOINT ["./server"]
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8000
+ENTRYPOINT ["java", "-jar", "app.jar"]

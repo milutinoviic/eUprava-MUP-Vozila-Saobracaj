@@ -69,27 +69,27 @@ func main() {
 	router.Use(handler.ExtractTraceInfoMiddleware)
 
 	// GET
-	router.HandleFunc("/violations/{id}", ph.HandleGettingViolationsByOfficer).Methods(http.MethodGet)
-	router.HandleFunc("/fines/unpaid/{jmbg}", ph.HandleGettingUnpaidFines).Methods(http.MethodGet)
-	router.HandleFunc("/vehicles/history/{registration}", ph.GetVehicleHistory).Methods(http.MethodGet)
-	router.HandleFunc("/police/statistics/{police}", ph.HandleDailyStatistics).Methods(http.MethodGet)
-	router.HandleFunc("/violations/history/{driverId}", ph.HandleViolationHistory).Methods(http.MethodGet)
-	router.HandleFunc("/violations/{format}/{period}", ph.HandleExportViolations).Methods(http.MethodGet)
-	router.HandleFunc("/police", ph.HandleGettingPolice).Methods(http.MethodGet)
-	router.HandleFunc("/owners", ph.BuildRequestForAllDrivers).Methods(http.MethodGet)
-	router.HandleFunc("/vehicles/stolen/{registration}", ph.HandleQuestionAboutVehicle).Methods(http.MethodGet)
-	router.HandleFunc("/owners/history/{registration}", ph.GetOwnershipHistoryForInvestigation).Methods(http.MethodGet)
+	//router.HandleFunc("/violations/{id}", ph.HandleGettingViolationsByOfficer).Methods(http.MethodGet)
+	//	router.HandleFunc("/fines/unpaid/{jmbg}", ph.HandleGettingUnpaidFines).Methods(http.MethodGet)
+	// router.HandleFunc("/vehicles/history/{registration}", ph.GetVehicleHistory).Methods(http.MethodGet)
+	//	router.HandleFunc("/police/statistics/{police}", ph.HandleDailyStatistics).Methods(http.MethodGet)
+	//	router.HandleFunc("/violations/history/{driverId}", ph.HandleViolationHistory).Methods(http.MethodGet)
+	//	router.HandleFunc("/violations/{format}/{period}", ph.HandleExportViolations).Methods(http.MethodGet)
+	//	router.HandleFunc("/police", ph.HandleGettingPolice).Methods(http.MethodGet)
+	// router.HandleFunc("/owners", ph.BuildRequestForAllDrivers).Methods(http.MethodGet)
+	//	router.HandleFunc("/vehicles/stolen/{registration}", ph.HandleQuestionAboutVehicle).Methods(http.MethodGet)
+	// router.HandleFunc("/owners/history/{registration}", ph.GetOwnershipHistoryForInvestigation).Methods(http.MethodGet)
 
 	// POST
-	router.HandleFunc("/violations/new", ph.HandleNewViolation).Methods(http.MethodPost)
-	router.HandleFunc("/vehicles/verify", ph.VerifyVehicleWithOwner).Methods(http.MethodPost)
-	router.HandleFunc("/vehicles/stolen/{registration}", ph.ReportVehicleAsStolen).Methods(http.MethodPost)
-	router.HandleFunc("/vehicles/search", ph.SearchVehicleByOptional).Methods(http.MethodPost)
+	//	router.HandleFunc("/violatio ns/new", ph.HandleNewViolation).Methods(http.MethodPost)
+	// router.HandleFunc("/vehicles/verify", ph.VerifyVehicleWithOwner).Methods(http.MethodPost)
+	// router.HandleFunc("/vehicles/stolen/{registration}", ph.ReportVehicleAsStolen).Methods(http.MethodPost)
+	// router.HandleFunc("/vehicles/search", ph.SearchVehicleByOptional).Methods(http.MethodPost)
 
 	// PATCH
-	router.HandleFunc("/violation/assign", ph.HandleAssignOfViolation).Methods(http.MethodPatch)
-	router.HandleFunc("/police/promotion/{policeId}", ph.HandleOfficerPromotion).Methods(http.MethodPatch)
-	router.HandleFunc("/police/suspend/{policeId}", ph.HandleOfficerSuspension).Methods(http.MethodPatch)
+	//	router.HandleFunc("/violation/assign", ph.HandleAssignOfViolation).Methods(http.MethodPatch)
+	//	router.HandleFunc("/police/promotion/{policeId}", ph.HandleOfficerPromotion).Methods(http.MethodPatch)
+	//	router.HandleFunc("/police/suspend/{policeId}", ph.HandleOfficerSuspension).Methods(http.MethodPatch)
 
 	router.Use(func(next http.Handler) http.Handler {
 		return AuthMiddleware("http://auth-service:8080")(next)
