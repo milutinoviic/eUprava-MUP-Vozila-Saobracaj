@@ -7,13 +7,12 @@ import com.example.auth.repo.UserRepository;
 import com.example.auth.security.JwtService;
 import com.example.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -37,10 +36,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public AuthResponse login(LoginRequest request) {
         AuthUser user = userRepository.findByEmail(request.getEmail().trim())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword().trim(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
 
         String token = jwtService.generateToken(
@@ -66,23 +65,36 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         AuthUser created = userRepository.save(user);
+
         if (created.getRole() == AuthUser.UserRole.POLICE) {
             String url = policeServiceUrl + "/police";
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            HttpEntity<AuthUser> entity = new HttpEntity<>(created, headers);
-            ResponseEntity<Void> response = restTemplate.postForEntity(url, entity, Void.class);
+            // Generate a JWT token for internal call
+            String token = jwtService.generateToken(
+                    user.getEmail(),
+                    user.getRole().name(),
+                    15 * 1000
+            );
+            headers.set("Authorization", "Bearer " + token);
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Failed to notify Traffic Police service");
+            HttpEntity<AuthUser> entity = new HttpEntity<>(created, headers);
+
+            try {
+                restTemplate.postForEntity(url, entity, Void.class);
+            } catch (HttpClientErrorException e) {
+                throw new ResponseStatusException(
+                        e.getStatusCode(), "Traffic Police service error: " + e.getResponseBodyAsString(), e
+                );
             }
         }
 
-        created.setPassword("");
 
+        created.setPassword("");
         return created;
     }
+
 
     @Override
     public Map<String, Object> verify(String token) {

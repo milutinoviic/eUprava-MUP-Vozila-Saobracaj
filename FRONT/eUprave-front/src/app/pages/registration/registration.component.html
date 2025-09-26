@@ -31,8 +31,8 @@
   <div>
     <label for="role">Role:</label>
     <select class="role-select" id="role" formControlName="role">
-      <option class="option-select" value="manager">Manager</option>
-      <option class="option-select" value="member">Member</option>
+      <option class="option-select" value="admin">Admin</option>
+      <option class="option-select" value="police">Police</option>
     </select>
   </div>
   <div *ngIf="registrationForm.get('role')?.touched">

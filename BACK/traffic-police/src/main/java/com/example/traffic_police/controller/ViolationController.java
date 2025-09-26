@@ -28,6 +28,7 @@ public class ViolationController {
         return ResponseEntity.ok(trafficPoliceService.getAssignedViolations(policeId));
     }
 
+
     @GetMapping("/history/{driverId}")
     public ResponseEntity<List<Violation>> getViolationsByDriver(@PathVariable String driverId) {
         return ResponseEntity.ok(trafficPoliceService.getViolationHistory(driverId));

@@ -1,7 +1,9 @@
-package com.example.traffic_police.security;
+package com.example.auth.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,19 +33,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() // Allow all requests
-                )
-                .httpBasic(AbstractHttpConfigurer::disable)  // disable basic auth
-                .formLogin(AbstractHttpConfigurer::disable)  // disable form login
-                .logout(AbstractHttpConfigurer::disable);    // disable logout
-
-        return http.build();
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll()) // Permit all requests
+                .build();
     }
-
 }
 

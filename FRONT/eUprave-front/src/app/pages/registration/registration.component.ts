@@ -28,8 +28,8 @@ export class RegistrationComponent implements OnInit {
       password: ['',
         [Validators.required, passwordValidator()]
       ],
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
+      fName: ['', [Validators.required]],
+      lName: ['', [Validators.required]],
       role: ['', [Validators.required]],
     });
   }
@@ -39,10 +39,11 @@ export class RegistrationComponent implements OnInit {
       const user: AuthUser = {
         email: this.registrationForm.get("email")?.value,
         password: this.registrationForm.get("password")?.value,
-        firstName: this.registrationForm.get("firstName")?.value,
-        lastName: this.registrationForm.get("lastName")?.value,
-        role: this.registrationForm.get("role")?.value,
+        firstName: this.registrationForm.get("fName")?.value,
+        lastName: this.registrationForm.get("lName")?.value,
+        role: this.registrationForm.get("role")?.value.toUpperCase(), // <-- convert here
       }
+
 
       this.auth.register(user).subscribe({
         next: () => {

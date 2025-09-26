@@ -1,1 +1,57 @@
 /* You can add global styles to this file, and also import other style files */
+body{
+  background-color: var(--hover-background-color);
+}
+
+:root {
+  --primary-color: #FFA726;
+  --hover-background-color: white;
+  --shadow--white: #F5F5F5;
+  --secondary-color: #E9F1F7;
+  --tercial-color: #28282B;
+  --red-primary-color: #F15946;
+  --red-secondary-color: #ED6A5A;
+  --green-primary-color: #2db629;
+
+
+}
+
+
+.toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1110;
+  text-align: center;
+}
+
+.toast-success {
+  background-color: var(--green-primary-color) !important;
+  color: var(--hover-background-color) !important;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.toast-error {
+  background-color: var(--red-primary-color) !important;
+  color: var(--hover-background-color) !important;
+  padding: 20px;
+  border-radius: 5px;
+
+}
+
+.toast-info {
+  background-color: var(--primary-color) !important;
+  color: var(--hover-background-color) !important;
+  padding: 20px;
+  border-radius: 5px;
+
+}
+
+.toast-warning {
+  background-color: #ff9800 !important;
+  color: var(--hover-background-color) !important;
+  border-radius: 5px;
+  padding: 20px;
+}

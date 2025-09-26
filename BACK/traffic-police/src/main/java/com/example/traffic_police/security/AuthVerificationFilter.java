@@ -34,13 +34,16 @@ public class AuthVerificationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
 
+
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             setCorsHeaders(response);
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
 
+
         setCorsHeaders(response);
+
 
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
