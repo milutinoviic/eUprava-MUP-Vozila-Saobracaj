@@ -9,7 +9,7 @@ import {RoutesService} from './routes.service';
 })
 export class AuthService {
 
-  private authUrl = 'http://localhost:8080/login';
+  private authUrl = 'http://localhost:8000/api/auth/login';
 
   constructor(private http: HttpClient, private routes: RoutesService) { }
 

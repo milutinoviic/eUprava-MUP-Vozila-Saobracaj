@@ -6,10 +6,22 @@ import { TokenService } from '../../core/utils/token.service';
 import { PoliceService } from '../../core/service/police.service';
 import { ToastrService } from 'ngx-toastr';
 import { ChartConfiguration } from 'chart.js';
+import {BaseChartDirective, NgChartsModule} from 'ng2-charts';
+import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-police-list',
   templateUrl: './police-list.component.html',
+  standalone: true,
+  imports: [
+    NgClass,
+    FormsModule,
+    NgChartsModule,
+    NgIf,
+    NgForOf,
+    // ✅ this is enough
+  ],
   styleUrls: ['./police-list.component.scss']
 })
 export class PoliceListComponent implements OnInit {

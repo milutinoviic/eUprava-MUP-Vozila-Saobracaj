@@ -4,7 +4,6 @@ import {Router} from '@angular/router';
 import {TokenService} from '../../core/utils/token.service';
 import {PoliceService} from '../../core/service/police.service';
 import {Rank} from '../../core/type/auth.types';
-import * as console from 'node:console';
 
 @Component({
   selector: 'app-home',

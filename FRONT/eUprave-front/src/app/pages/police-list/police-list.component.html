@@ -10,8 +10,9 @@
   <div class="cards-grid">
     <ng-container *ngFor="let p of filteredPolice(); trackBy: trackById">
       <article class="card">
+
         <div class="avatar" [attr.aria-label]="fullName(p)">
-          <span class="initials">{{ p.firstName?.charAt(0) }}{{ p.lastName?.charAt(0) }}</span>
+          <span class="initials">{{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}</span>
         </div>
 
         <div class="card-body">
