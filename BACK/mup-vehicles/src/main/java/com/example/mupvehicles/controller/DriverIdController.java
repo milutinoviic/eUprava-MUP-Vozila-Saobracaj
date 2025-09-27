@@ -20,20 +20,16 @@ public class DriverIdController {
         this.driverIdService = driverIdService;
     }
 
-    @PostMapping
-    public DriverIdDto createDriverId(@Valid @RequestBody CreateDriverIdDto createDriverIdDto) {
-        return driverIdService.createDriverId(createDriverIdDto);
-    }
 
     @GetMapping("/{jmbg}")
     public DriverIdDto getDriverIdByOwner(@PathVariable String jmbg) {
         return driverIdService.getDriverId(jmbg);
     }
 
-    @DeleteMapping("/deleteDriverId/{id}")
-    public ResponseEntity<Void> deleteDriverId(@PathVariable String id) {
-        driverIdService.deleteDriverId(id);
-        return ResponseEntity.ok().build();
+
+    @PostMapping
+    public DriverIdDto createDriverId(@Valid @RequestBody CreateDriverIdDto createDriverIdDto) {
+        return driverIdService.createDriverId(createDriverIdDto);
     }
 
     @PatchMapping("/suspendDriverId")
@@ -46,5 +42,10 @@ public class DriverIdController {
         return driverIdService.reactivateDriverId(reactivateDriverId);
     }
 
+    @DeleteMapping("/deleteDriverId/{id}")
+    public ResponseEntity<Void> deleteDriverId(@PathVariable String id) {
+        driverIdService.deleteDriverId(id);
+        return ResponseEntity.ok().build();
+    }
 
 }

@@ -29,6 +29,11 @@ public class VehicleController {
         return new ResponseEntity<>(vehicleService.findAllVehiclesByOwnerJmbg(jmbg), HttpStatus.OK);
     }
 
+    @GetMapping("/registration/{registration}")
+    public VehicleDto findVehicleByRegistration(@PathVariable String registration) {
+        return vehicleService.findVehicleByRegistration(registration);
+    }
+
     @GetMapping("/isStolen/{registration}")
     public String isStolen(@PathVariable String registration) {
         return vehicleService.isVehicleStolen(registration);
@@ -37,11 +42,6 @@ public class VehicleController {
     @PostMapping("/search")
     public List<VehicleDto> searchVehicles(@RequestBody VehicleSearchRequest request) {
         return vehicleService.searchVehicles(request);
-    }
-
-    @GetMapping("/registration/{registration}")
-    public VehicleDto findVehicleByRegistration(@PathVariable String registration) {
-        return vehicleService.findVehicleByRegistration(registration);
     }
 
     @PostMapping("/createVehicle")
