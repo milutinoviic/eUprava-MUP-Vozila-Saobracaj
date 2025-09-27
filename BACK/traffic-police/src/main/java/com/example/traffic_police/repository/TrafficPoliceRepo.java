@@ -132,6 +132,11 @@ public class TrafficPoliceRepo {
         return mongoTemplate.insert(fine);
     }
 
+    public Fine getFineByViolationId(String violationId) {
+        Query query = new Query(Criteria.where("violationID").is(violationId));
+        return mongoTemplate.findOne(query, Fine.class);
+    }
+
     // ------------------ VEHICLE ------------------
 
     public List<Violation> checkVehicleViolations(String vehicleId) {

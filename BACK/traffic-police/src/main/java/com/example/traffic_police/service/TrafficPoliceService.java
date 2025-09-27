@@ -22,6 +22,7 @@ public interface TrafficPoliceService {
     void markFineAsPaid(String fineId);
     List<Fine> findUnpaidFinesByDriverId(String driverId);
     Fine insertFine(Fine fine);
+    Fine getFineByViolationId(String violationId);
 
     // ------------------ VIOLATIONS ------------------
     List<Violation> getAllViolations();
@@ -44,4 +45,8 @@ public interface TrafficPoliceService {
     String verifyVehicle(VehicleVerificationRequest request);
     VehicleDTO reportVehicleAsStolen(String registration);
     List<VehicleDTO> searchVehicleByOptional(SearchVehicleRequest dto);
+    DriverIDDTO searchDriverIDByDriverId(String driverId);
+    List<VehicleDTO> findAllVehicles(String driverId);
+
+
 }

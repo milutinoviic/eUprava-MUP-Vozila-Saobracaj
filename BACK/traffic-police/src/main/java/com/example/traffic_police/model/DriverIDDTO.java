@@ -8,8 +8,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DriverIDDTO {
+
     private String id;
-    private String ownerID;
+
     private boolean isSuspended;
-    private int numberOfViolations;
+
+    private int numberOfViolationPoints;
+
+    private String picture;
+
+    private OwnerDTO owner;
 }

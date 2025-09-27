@@ -43,12 +43,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // only allow register/login without token
-                        .requestMatchers("/api/driverIds/**").hasAnyAuthority("User", "Admin")
-                        .requestMatchers("/api/owners/**").hasAnyAuthority("User", "Admin")
-                        .requestMatchers("/api/ownerTransfers/**").hasAnyAuthority("User", "Admin")
-                        .requestMatchers("/api/ownerTransfers/**").hasAnyAuthority("User", "Admin")
-                        .requestMatchers("/police/**").hasAnyAuthority("User", "Admin")
-                        .requestMatchers("/api/vehicles/**").hasAnyAuthority("User", "Admin")
+                        .requestMatchers("/api/driverIds/**").permitAll()
+                        .requestMatchers("/api/owners/**").permitAll()
+                        .requestMatchers("/api/ownerTransfers/**").permitAll()
+                        .requestMatchers("/api/ownerTransfers/**").permitAll()
+                        .requestMatchers("/police/**").permitAll()
+                        .requestMatchers("/api/vehicles/**").permitAll()
                         // everything else must go through your filter
                         .anyRequest().authenticated()
                 )

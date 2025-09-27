@@ -6,14 +6,19 @@ import com.example.traffic_police.service.TrafficPoliceService;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -107,6 +112,11 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
         return repo.insertFine(fine);
     }
 
+    @Override
+    public Fine getFineByViolationId(String violationId) {
+        return repo.getFineByViolationId(violationId);
+    }
+
     // ------------------ VIOLATIONS ------------------
     @Override
     public List<Violation> getAllViolations() {
@@ -152,14 +162,39 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
     @Override
     public List<OwnerDTO> fetchAllDrivers() {
         String url = mupBaseUrl + "/owners";
+
+        // Get the current request (from frontend → traffic-police-service)
+        HttpEntity<Void> entity = getVoidHttpEntity();
+
         ResponseEntity<OwnerDTO[]> response =
-                restTemplate.getForEntity(url, OwnerDTO[].class);
+                restTemplate.exchange(url, HttpMethod.GET, entity, OwnerDTO[].class);
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new RuntimeException("Failed to fetch drivers from MUP service");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Failed to fetch drivers from MUP service"
+            );
         }
 
         return Arrays.asList(response.getBody());
+    }
+
+    private static HttpHeaders getAuthHeaders() {
+        HttpServletRequest currentRequest =
+                ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
+                        .getRequest();
+
+        String authHeader = currentRequest.getHeader("Authorization");
+
+        HttpHeaders headers = new HttpHeaders();
+        if (authHeader != null) {
+            headers.set("Authorization", authHeader);
+        }
+        return headers;
+    }
+
+    private static HttpEntity<Void> getVoidHttpEntity() {
+        return new HttpEntity<>(getAuthHeaders());
     }
 
     @Override
@@ -167,7 +202,9 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
         String url = mupBaseUrl + "/vehicles/isStolen/" + registration;
 
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            ResponseEntity<String> response =
+                    restTemplate.exchange(url, HttpMethod.GET, getVoidHttpEntity(), String.class);
+
 
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 return "Unknown response from vehicle service";
@@ -193,7 +230,7 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
 
         try {
             ResponseEntity<OwnershipTransferDTO[]> response =
-                    restTemplate.getForEntity(url, OwnershipTransferDTO[].class);
+                    restTemplate.exchange(url, HttpMethod.GET, getVoidHttpEntity(), OwnershipTransferDTO[].class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 return Arrays.asList(response.getBody());
@@ -259,10 +296,13 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
     public List<OwnerDTO> handleDriverSuspension(SuspendDriverIdRequest dto) {
         String url = mupBaseUrl + "/driverIds/suspendDriverId";
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<SuspendDriverIdRequest> entity = new HttpEntity<>(dto, headers);
+
+        restTemplate.exchange(url, HttpMethod.PATCH, entity, Void.class);
+
 
         restTemplate.patchForObject(url, entity, Void.class);
 
@@ -315,12 +355,14 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
     public String verifyVehicle(VehicleVerificationRequest request) {
         String url = mupServiceUrl + "/vehicles/verify";
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<VehicleVerificationRequest> entity = new HttpEntity<>(request, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response =
+                restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
         String raw = Objects.requireNonNull(response.getBody()).trim();
 
         return getMessage(raw);
@@ -330,13 +372,14 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
     public VehicleDTO reportVehicleAsStolen(String registration) {
         String url = mupServiceUrl + "/vehicles/" + registration + "/report-stolen";
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         ResponseEntity<VehicleDTO> response =
                 restTemplate.exchange(url, HttpMethod.POST, entity, VehicleDTO.class);
+
 
         return response.getBody();
     }
@@ -345,12 +388,14 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
     public List<VehicleDTO> searchVehicleByOptional(SearchVehicleRequest dto) {
         String url = mupBaseUrl + "/vehicles/search";
 
-        HttpHeaders headers = new HttpHeaders();
+        HttpHeaders headers = getAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<SearchVehicleRequest> entity = new HttpEntity<>(dto, headers);
 
-        ResponseEntity<VehicleDTO[]> response = restTemplate.postForEntity(url, entity, VehicleDTO[].class);
+        ResponseEntity<VehicleDTO[]> response =
+                restTemplate.exchange(url, HttpMethod.POST, entity, VehicleDTO[].class);
+
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw new RuntimeException("Failed to search vehicles: " + response.getStatusCode());
@@ -358,6 +403,34 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
 
         return Arrays.asList(response.getBody());
     }
+
+    @Override
+    public DriverIDDTO searchDriverIDByDriverId(String driverId) {
+        String url = mupBaseUrl + "/driverIds/" + driverId;
+        ResponseEntity<DriverIDDTO> response =
+                restTemplate.exchange(url, HttpMethod.GET, getVoidHttpEntity(), DriverIDDTO.class);
+        return response.getBody();
+    }
+
+    @Override
+    public List<VehicleDTO> findAllVehicles(String driverId) {
+        String url = mupBaseUrl + "/vehicles/getVehiclesByRegistration/" + driverId;
+
+        ResponseEntity<List<VehicleDTO>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                getVoidHttpEntity(),
+                new ParameterizedTypeReference<List<VehicleDTO>>() {}
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            return List.of();
+        }
+
+        return response.getBody();
+    }
+
+
 
     private static String getMessage(String raw) {
         String message;

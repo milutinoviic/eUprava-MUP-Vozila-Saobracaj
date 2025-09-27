@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Rank, StatisticDTO} from '../../core/type/auth.types';
+import {Rank, StatisticDTO} from '../type/auth.types';
 import {RoutesService} from './routes.service';
 
 @Injectable({

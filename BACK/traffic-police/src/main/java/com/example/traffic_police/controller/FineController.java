@@ -32,4 +32,9 @@ public class FineController {
         return ResponseEntity.ok(trafficPoliceService.findUnpaidFinesByDriverId(jmbg));
     }
 
+    @GetMapping("/violation/{id}")
+    public ResponseEntity<Fine> getFineById(@PathVariable String id) {
+        return ResponseEntity.ok(trafficPoliceService.getFineByViolationId(id));
+    }
+
 }

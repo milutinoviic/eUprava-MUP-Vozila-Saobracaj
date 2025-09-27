@@ -44,7 +44,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // only allow register/login without token
                         .requestMatchers("/api/police/**").permitAll()
+                        .requestMatchers("/api/owners/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/vehicles/**").permitAll()
                         .requestMatchers("/api/police").permitAll()
                         // everything else must go through your filter
                         .anyRequest().authenticated()

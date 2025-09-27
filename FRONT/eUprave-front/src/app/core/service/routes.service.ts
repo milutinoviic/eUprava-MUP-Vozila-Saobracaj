@@ -33,6 +33,7 @@ export class RoutesService {
   public readonly OWNERS_ALL = `${this._traffic_api_url}/owners`;
   public readonly OWNERS_HISTORY = (registration: string) =>
     `${this._traffic_api_url}/owners/history/${registration}`;
+  public readonly OWNERS_ID = (id: string) => `${this._traffic_api_url}/owners/id/${id}`;
 
   // =====================
   // POLICE
@@ -56,6 +57,7 @@ export class RoutesService {
   public readonly VEHICLE_REPORT_STOLEN = (registration: string) =>
     `${this._traffic_api_url}/vehicles/stolen/${registration}`;
   public readonly VEHICLE_SEARCH = `${this._traffic_api_url}/vehicles/search`;
+  public readonly VEHICLES_DRIVER = (policeId: string) => `${this._traffic_api_url}/vehicles/driver/${policeId}`;
 
   // =====================
   // VIOLATIONS

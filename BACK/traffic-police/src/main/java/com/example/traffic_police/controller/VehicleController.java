@@ -42,5 +42,10 @@ public class VehicleController {
         return ResponseEntity.ok(service.searchVehicleByOptional(req));
     }
 
+    @GetMapping("/driver/{id}")
+    public ResponseEntity<List<VehicleDTO>> getVehicles(@PathVariable String id) {
+        return ResponseEntity.ok(service.findAllVehicles(id));
+    }
+
 
 }

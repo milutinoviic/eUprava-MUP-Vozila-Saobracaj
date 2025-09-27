@@ -54,3 +54,24 @@ export interface OwnerDTO {
   jmbg: string;
   email: string;
 }
+
+export interface OwnerIdDTO {
+  id: string;
+  isSuspended: boolean;
+  numberOfViolationPoints: number;
+  picture: string;
+  owner: OwnerDTO;
+
+}
+
+export interface VehicleDTO {
+  id: string;
+  mark: string;
+  model: string;
+  registration: string;
+  year: number;
+  color: string;
+  isStolen: boolean;
+  ownerId: string;
+
+}

@@ -1,5 +1,10 @@
-<div class="cards-container">
-  <div class="owner-card" *ngFor="let owner of owners">
+<div class="toolbar">
+  <input type="search" placeholder="Search owners..." [(ngModel)]="query" />
+  <button class="refresh" (click)="fetchOwners()" title="Refresh">⟳</button>
+</div>
+
+<div class="cards-container" *ngIf="isOn">
+  <div class="owner-card" *ngFor="let owner of filteredOwners()">
     <div class="owner-header">
       <h3>{{ owner.firstName }} {{ owner.lastName }}</h3>
       <p class="email">{{ owner.email }}</p>
@@ -7,6 +12,49 @@
     <div class="owner-body">
       <p><strong>Address:</strong> {{ owner.address }}</p>
       <p><strong>JMBG:</strong> {{ owner.jmbg }}</p>
+    </div>
+
+    <div class="owner-actions">
+      <button class="btn primary" (click)="showDriverId(owner)">See Driver ID</button>
+      <button class="btn secondary" (click)="showVehicles(owner)">See Vehicles</button>
+      <button class="btn danger" (click)="showViolations(owner)">See Violations</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Driver ID Modal -->
+<div class="modal-backdrop" *ngIf="selectedId">
+  <div class="modal-window">
+    <h2>Driver ID</h2>
+    <div class="driver-id-card">
+      <p><strong>Name:</strong> {{ selectedOwner?.firstName }} {{ selectedOwner?.lastName }}</p>
+      <p><strong>JMBG:</strong> {{ selectedOwner?.jmbg }}</p>
+      <p><strong>Address:</strong> {{ selectedOwner?.address }}</p>
+      <p><strong>Email:</strong> {{ selectedOwner?.email }}</p>
+      <p><strong>Number of violations:</strong>{{selectedId.numberOfViolationPoints}}</p>
+      <p><strong>Suspended:</strong> {{ selectedId.isSuspended ? 'Y' : 'N' }}</p>
+    </div>
+    <button class="close-btn" (click)="closeModal()">Close</button>
+  </div>
+</div>
+
+
+<div class="cards-container" *ngIf="ownersVehicles.length > 0">
+  <div class="owner-card" *ngFor="let vehicle of ownersVehicles">
+    <div class="owner-header">
+      <h3>{{ vehicle.mark }}</h3>
+      <p class="model">{{ vehicle.model }}</p>
+    </div>
+    <div class="owner-body">
+      <p><strong>Color:</strong> {{ vehicle.color }}</p>
+      <p><strong>Registration:</strong> {{ vehicle.registration }}</p>
+      <p><strong>Year:</strong> {{vehicle.year}}</p>
+      <p><strong>Stolen:</strong> {{vehicle.isStolen ? 'Y' : 'N'}}</p>
+    </div>
+
+    <div class="owner-actions">
+
     </div>
   </div>
 </div>
