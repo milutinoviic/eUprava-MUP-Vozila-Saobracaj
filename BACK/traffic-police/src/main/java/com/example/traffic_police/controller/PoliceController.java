@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RequestMapping("/api/police")
 public class PoliceController {
 
@@ -22,11 +24,11 @@ public class PoliceController {
 
     @GetMapping
     public ResponseEntity<List<PoliceDTO>> GetAllPolice() {
-        List<PoliceDTO> dto = new ArrayList<>();
-        List<PolicePerson> people = trafficPoliceService.getAllPolice();
-        for (PolicePerson p : people) {
-            dto.add(new PoliceDTO(p));
-        }
+        List<PoliceDTO> dto = trafficPoliceService.getAllPolice().stream()
+                .filter(Objects::nonNull)
+                .map(PoliceDTO::new)
+                .toList();
+
         return ResponseEntity.ok(dto);
     }
 

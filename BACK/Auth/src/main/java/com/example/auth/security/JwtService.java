@@ -18,7 +18,7 @@ public class JwtService {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(String email, String role, long ttlMillis) {
+    public String generateToken(String email, String role, String userId, long ttlMillis) {
         long now = System.currentTimeMillis();
         Date issuedAt = new Date(now);
         Date expiry = new Date(now + ttlMillis);
@@ -26,11 +26,13 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
+                .claim("id", userId)          // <-- add the ID here
                 .setIssuedAt(issuedAt)
                 .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public Claims verifyToken(String token) {
         try {

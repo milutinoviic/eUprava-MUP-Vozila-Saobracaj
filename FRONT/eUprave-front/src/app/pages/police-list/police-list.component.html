@@ -12,7 +12,10 @@
       <article class="card">
 
         <div class="avatar" [attr.aria-label]="fullName(p)">
-          <span class="initials">{{ p.firstName.charAt(0) }}{{ p.lastName.charAt(0) }}</span>
+          <span class="initials">
+  {{ (p.firstName || '').charAt(0) }}{{ (p.lastName || '').charAt(0) }}
+</span>
+
         </div>
 
         <div class="card-body">
@@ -25,7 +28,14 @@
           </div>
 
           <p class="actions">
-            <button class="btn small" (click)="suspendPolice(p.id)">Suspend</button>
+            <button
+              class="btn small"
+              [ngClass]="!p.suspended ? 'btn-ghost' : 'btn-primary'"
+              (click)="suspendPolice(p.id)">
+              {{ p.suspended ? 'Unsuspend' : 'Suspend' }}
+            </button>
+
+
             <button class="btn small ghost" (click)="promotePolice(p.id)">Promote</button>
             <button class="btn small ghost" (click)="seeStatistics(p.id)">See statistics</button>
           </p>

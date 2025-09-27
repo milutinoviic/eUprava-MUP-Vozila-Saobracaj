@@ -55,9 +55,14 @@ export class PoliceListComponent implements OnInit {
     const loggedInUserId = this.tokenService.getUserId()!.toString();
     this.loading = true;
     this.error = null;
+
     this.http.get<PoliceDTO[]>(this.routes.POLICE_ALL).subscribe({
       next: data => {
-        this.police = data.filter(police => police.id !== loggedInUserId) || [];
+        console.log(data);
+        // filter out logged-in user AND incomplete objects
+        this.police = (data || []).filter(
+          p => p.id && p.id !== loggedInUserId && p.firstName && p.lastName
+        );
         this.loading = false;
       },
       error: err => {
@@ -68,12 +73,13 @@ export class PoliceListComponent implements OnInit {
     });
   }
 
+
   fullName(p: PoliceDTO): string {
     return `${p.firstName} ${p.lastName}`;
   }
 
   rankLabel(rank: Rank | number): string {
-    switch (Number(rank)) {
+    switch (rank) {
       case Rank.LOW: return 'Officer';
       case Rank.MEDIUM: return 'Sergeant';
       case Rank.HIGH: return 'Inspector';
@@ -82,7 +88,7 @@ export class PoliceListComponent implements OnInit {
   }
 
   rankClass(rank: Rank | number): string {
-    switch (Number(rank)) {
+    switch (rank) {
       case Rank.LOW: return 'rank-low';
       case Rank.MEDIUM: return 'rank-medium';
       case Rank.HIGH: return 'rank-high';
@@ -106,14 +112,16 @@ export class PoliceListComponent implements OnInit {
   suspendPolice(id: string) {
     this.service.suspendOfficer(id).subscribe({
       next: () => {
-        this.toastr.success("Successfully suspended the officer");
-        this.fetchPolice();
+        this.toastr.success('Operation successful');
+        this.fetchPolice(); // refresh list
       },
-      error: err => {
-        this.toastr.error(err.error());
+      error: (err) => {
+        const msg = err?.error?.message || err?.message || 'An unexpected error occurred';
+        this.toastr.error(msg);
       }
     });
   }
+
 
   promotePolice(id: string) {
     this.service.promoteOfficer(id).subscribe({
@@ -122,7 +130,12 @@ export class PoliceListComponent implements OnInit {
         this.fetchPolice();
       },
       error: err => {
-        this.toastr.error(err.error());
+        if (err.status === 403) {
+          this.toastr.error("The officer already has the highest rank");
+        } else {
+          const msg = err?.error?.message || err?.message || 'An unexpected error occurred';
+          this.toastr.error(msg);
+        }
       }
     });
   }

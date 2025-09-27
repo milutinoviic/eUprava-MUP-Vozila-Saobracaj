@@ -12,10 +12,12 @@ import org.springframework.http.*;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -193,16 +195,17 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
             ResponseEntity<OwnershipTransferDTO[]> response =
                     restTemplate.getForEntity(url, OwnershipTransferDTO[].class);
 
-            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-                throw new RuntimeException("Failed to fetch ownership history for " + registration);
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                return Arrays.asList(response.getBody());
+            } else {
+                return Collections.emptyList();
             }
 
-            return Arrays.asList(response.getBody());
-
-        } catch (Exception e) {
-            throw new RuntimeException("Error communicating with MUP service: " + e.getMessage(), e);
+        } catch (RestClientException e) {
+            return Collections.emptyList();
         }
     }
+
 
     @Override
     public void notifyPersonOfViolation(Violation violation, OwnerDTO owner) throws MessagingException {

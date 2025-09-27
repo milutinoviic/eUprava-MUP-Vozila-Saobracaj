@@ -1,10 +1,33 @@
-.arrow {
-  border: solid black;
-  border-width: 0 3px 3px 0;
-  display: inline-block;
-  padding: 3px;
-}
-.left {
-  transform: rotate(135deg);
-  -webkit-transform: rotate(135deg);
+.go-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  color: #334155; // dark gray
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s ease, transform 0.15s ease;
+
+  i.arrow.left {
+    display: inline-block;
+    border: solid #334155;
+    border-width: 0 2px 2px 0;
+    padding: 4px;
+    transform: rotate(135deg);
+    transition: border-color 0.2s ease, transform 0.15s ease;
+  }
+
+  &:hover {
+    color: #6366f1; // nice purple accent
+    transform: translateX(-2px);
+
+    i.arrow.left {
+      border-color: #6366f1;
+      transform: rotate(135deg) translateX(-1px);
+    }
+  }
+
+  &:active {
+    transform: translateX(-1px);
+  }
 }

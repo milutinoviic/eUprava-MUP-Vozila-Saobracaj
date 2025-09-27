@@ -30,13 +30,14 @@ enum Role {
 }
 
 export enum Rank {
-  LOW, MEDIUM, HIGH
+  LOW = 'LOW', MEDIUM = 'MEDIUM', HIGH = 'HIGH'
 }
 
 export interface PoliceDTO {
   id: string;
   firstName: string;
   lastName: string;
+  suspended: boolean;
   rank: Rank;
 }
 
@@ -45,3 +46,11 @@ export interface StatisticDTO {
   numberOfViolations: number;
 }
 
+export interface OwnerDTO {
+  id: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  jmbg: string;
+  email: string;
+}

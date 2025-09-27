@@ -16,14 +16,20 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private final AuthVerificationFilter authVerificationFilter;
+
+    public SecurityConfig(AuthVerificationFilter authVerificationFilter) {
+        this.authVerificationFilter = authVerificationFilter;
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); // Allow all origins
-        configuration.setAllowedMethods(List.of("*")); // Allow all HTTP methods
-        configuration.setAllowedHeaders(List.of("*")); // Allow all headers
-        configuration.setExposedHeaders(List.of("*")); // Optional
-        configuration.setAllowCredentials(false); // Must be false if using "*"
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(List.of("*"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("*"));
+        configuration.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -36,14 +42,18 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() // Allow all requests
+                        // only allow register/login without token
+                        .requestMatchers("/api/police/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/police").permitAll()
+                        // everything else must go through your filter
+                        .anyRequest().authenticated()
                 )
-                .httpBasic(AbstractHttpConfigurer::disable)  // disable basic auth
-                .formLogin(AbstractHttpConfigurer::disable)  // disable form login
-                .logout(AbstractHttpConfigurer::disable);    // disable logout
+                .addFilterBefore(authVerificationFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
-
 }
-

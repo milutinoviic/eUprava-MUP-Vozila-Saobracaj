@@ -1,0 +1,12 @@
+<div class="cards-container">
+  <div class="owner-card" *ngFor="let owner of owners">
+    <div class="owner-header">
+      <h3>{{ owner.firstName }} {{ owner.lastName }}</h3>
+      <p class="email">{{ owner.email }}</p>
+    </div>
+    <div class="owner-body">
+      <p><strong>Address:</strong> {{ owner.address }}</p>
+      <p><strong>JMBG:</strong> {{ owner.jmbg }}</p>
+    </div>
+  </div>
+</div>

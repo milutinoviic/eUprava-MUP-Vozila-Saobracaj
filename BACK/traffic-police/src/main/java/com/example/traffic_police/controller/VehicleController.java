@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RequestMapping("/api/vehicles")
 public class VehicleController {
 

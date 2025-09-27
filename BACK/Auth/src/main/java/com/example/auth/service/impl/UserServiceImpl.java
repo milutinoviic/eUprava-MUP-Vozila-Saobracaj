@@ -6,12 +6,14 @@ import com.example.auth.model.LoginRequest;
 import com.example.auth.repo.UserRepository;
 import com.example.auth.security.JwtService;
 import com.example.auth.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
@@ -19,18 +21,22 @@ import java.util.Map;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Value("${police.service.url}")
     private String policeServiceUrl;
 
-    public UserServiceImpl(UserRepository userRepository, JwtService jwtService) {
+    public UserServiceImpl(UserRepository userRepository,
+                           JwtService jwtService,
+                           RestClient.Builder restClientBuilder) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
-        this.restTemplate = new RestTemplate();
+        this.restClient = restClientBuilder.build();
     }
 
     @Override
@@ -44,18 +50,22 @@ public class UserServiceImpl implements UserService {
 
         String token = jwtService.generateToken(
                 user.getEmail(),
+
                 user.getRole().name(),
-                10 * 60 * 1000
+                user.getId(),
+                10 * 60 * 1000 // 10 minutes
         );
         return new AuthResponse(token, user);
     }
 
     @Override
     public AuthUser register(AuthUser req) {
+        // Check if email already exists
         if (userRepository.existsByEmail(req.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
+        // Create user entity
         AuthUser user = AuthUser.builder()
                 .email(req.getEmail().trim())
                 .firstName(req.getFirstName().trim())
@@ -66,31 +76,43 @@ public class UserServiceImpl implements UserService {
 
         AuthUser created = userRepository.save(user);
 
+        // If role is POLICE, register in Traffic Police service
         if (created.getRole() == AuthUser.UserRole.POLICE) {
-            String url = policeServiceUrl + "/police";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // Generate a JWT token for internal call
+            // Generate JWT token for internal call
             String token = jwtService.generateToken(
                     user.getEmail(),
                     user.getRole().name(),
-                    15 * 1000
+                    user.getId(),
+                    5 * 60 * 1000 // 5 minutes
             );
-            headers.set("Authorization", "Bearer " + token);
 
-            HttpEntity<AuthUser> entity = new HttpEntity<>(created, headers);
+            // Build WebClient
+            WebClient webClient = WebClient.builder()
+                    .baseUrl(policeServiceUrl)
+                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .build();
 
             try {
-                restTemplate.postForEntity(url, entity, Void.class);
-            } catch (HttpClientErrorException e) {
+                webClient.post()
+                        .uri("/police")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .bodyValue(created)
+                        .retrieve()
+                        .toBodilessEntity()
+                        .block(); // Execute synchronously
+
+                log.info("✅ Successfully registered police user in Traffic Police service: {}", created.getEmail());
+            } catch (Exception e) {
+                log.error("❌ Error calling Traffic Police service at {}. Cause: {}", policeServiceUrl + "/police", e.getMessage(), e);
                 throw new ResponseStatusException(
-                        e.getStatusCode(), "Traffic Police service error: " + e.getResponseBodyAsString(), e
+                        HttpStatus.BAD_GATEWAY,
+                        "Traffic Police service error: " + e.getMessage(),
+                        e
                 );
             }
         }
 
-
+        // Hide password before returning
         created.setPassword("");
         return created;
     }

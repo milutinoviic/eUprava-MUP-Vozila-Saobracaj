@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {TokenService} from '../../core/utils/token.service';
 import {PoliceService} from '../../core/service/police.service';
 import {Rank} from '../../core/type/auth.types';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,7 @@ export class HomeComponent implements OnInit{
   public role: string | null | undefined;
   public rank: Rank | undefined;
 
-  constructor(private router: Router, private token: TokenService, private policeService: PoliceService) {
+  constructor(private router: Router, private token: TokenService, private policeService: PoliceService, private toastr: ToastrService) {
   }
 
   checkRole() {
@@ -23,6 +24,7 @@ export class HomeComponent implements OnInit{
     if (this.role == 'POLICE') {
       this.policeService.findRank(this.token.getUserId()!.toString()).subscribe({
         next: (result) => {
+          console.log(result);
           this.rank = result;
         },
         error: err => {
@@ -40,5 +42,12 @@ export class HomeComponent implements OnInit{
 
   goTo(url: string) {
     this.router.navigate([url])
+  }
+
+  logOut() {
+    localStorage.removeItem('authToken');
+    this.router.navigate(["/login"]).then(() => {
+      this.toastr.success("Successfully logged out");
+    })
   }
 }

@@ -14,13 +14,17 @@ import { TrafficPoliceMainComponent } from './pages/traffic-police-main/traffic-
 // ✅ Import the module, not the directive
 import { NgChartsModule } from 'ng2-charts';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {AuthInterceptor} from './core/interceptor/auth.interceptor';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import { OwnerListComponent } from './pages/owner-list/owner-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RegistrationComponent,
     HomeComponent,
-    TrafficPoliceMainComponent, // PoliceListComponent removed
+    TrafficPoliceMainComponent,
+    OwnerListComponent, // PoliceListComponent removed
   ],
   imports: [
     BrowserModule,
@@ -33,7 +37,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     PoliceListComponent, // ✅ standalone, keep here
     NgChartsModule       // ✅ use module instead of BaseChartDirective
   ],
-  providers: [],
+  providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

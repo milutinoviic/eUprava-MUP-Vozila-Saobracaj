@@ -10,10 +10,13 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,19 +53,24 @@ public class TrafficPoliceRepo {
 
     public void suspendOfficer(String officerId) {
         Query query = new Query(Criteria.where("id").is(officerId));
-        Update update = new Update().set("isSuspended", true);
+        PolicePerson officer = mongoTemplate.findOne(query, PolicePerson.class);
+        if (officer == null) return;
+
+        Update update = new Update().set("isSuspended", !officer.isSuspended());
         mongoTemplate.updateFirst(query, update, PolicePerson.class);
     }
 
     public void promoteOfficer(String officerId) {
         Query query = new Query(Criteria.where("id").is(officerId));
         PolicePerson officer = mongoTemplate.findOne(query, PolicePerson.class);
-        if (officer == null) return;
+        if (officer == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Officer not found");
+        }
 
         switch (officer.getRank()) {
             case LOW -> mongoTemplate.updateFirst(query, new Update().set("rank", PolicePerson.Rank.MEDIUM), PolicePerson.class);
             case MEDIUM -> mongoTemplate.updateFirst(query, new Update().set("rank", PolicePerson.Rank.HIGH), PolicePerson.class);
-            case HIGH -> throw new RuntimeException("Officer already has the highest rank");
+            case HIGH -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Officer already has the highest rank");
         }
     }
 
