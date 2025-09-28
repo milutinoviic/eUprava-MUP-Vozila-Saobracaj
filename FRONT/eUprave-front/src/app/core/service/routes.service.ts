@@ -26,7 +26,7 @@ export class RoutesService {
   public readonly FINES_ALL = `${this._traffic_api_url}/fines`;
   public readonly FINES_UPDATE = (id: string) => `${this._traffic_api_url}/fines/${id}`;
   public readonly FINES_UNPAID = (jmbg: string) => `${this._traffic_api_url}/fines/unpaid/${jmbg}`;
-
+  public readonly FINES_VIOLATION = (id: string) => `${this._traffic_api_url}/fines/violation/${id}`;
   // =====================
   // OWNERS
   // =====================
@@ -73,5 +73,5 @@ export class RoutesService {
   public readonly VIOLATIONS_ASSIGN = (officerId: string, violationId: string) =>
     `${this._traffic_api_url}/violations/assign/${officerId}/${violationId}`;
   public readonly VIOLATIONS_BY_VEHICLE = (vehicleId: string) =>
-    `${this._traffic_api_url}/violations/history/${vehicleId}`;
+    `${this._traffic_api_url}/violations/vehicle/history/${vehicleId}`;
 }

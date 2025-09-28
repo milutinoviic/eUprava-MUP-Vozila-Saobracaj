@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class OwnershipTransferDTO {
     private String id;
     private VehicleDTO vehicle;
-    private OwnerDTO oldOwner;
-    private OwnerDTO newOwner;
+    private OwnerDTO ownerOld;
+    private OwnerDTO ownerNew;
     private LocalDateTime dateOfTransfer;
 }

@@ -51,7 +51,7 @@ public class ViolationController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/history/{vehicleId}")
+    @GetMapping("/history/vehicle/{vehicleId}")
     public ResponseEntity<List<Violation>> getViolationsByVehicle(@PathVariable String vehicleId) {
         return ResponseEntity.ok(trafficPoliceService.checkVehicleViolations(vehicleId));
     }

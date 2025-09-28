@@ -17,6 +17,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AuthInterceptor} from './core/interceptor/auth.interceptor';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { OwnerListComponent } from './pages/owner-list/owner-list.component';
+import { FineListComponent } from './pages/fine-list/fine-list.component';
+import { VehicleListComponent } from './pages/vehicle-list/vehicle-list.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,9 @@ import { OwnerListComponent } from './pages/owner-list/owner-list.component';
     RegistrationComponent,
     HomeComponent,
     TrafficPoliceMainComponent,
-    OwnerListComponent, // PoliceListComponent removed
+    OwnerListComponent,
+    FineListComponent,
+    VehicleListComponent, // PoliceListComponent removed
   ],
   imports: [
     BrowserModule,

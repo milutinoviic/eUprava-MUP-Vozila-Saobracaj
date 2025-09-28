@@ -1,0 +1,124 @@
+<div class="button-container">
+  <button class="btn btn-1" (click)="turnOnModal('stolen')">Check if car is stolen</button>
+  <button class="btn btn-2" (click)="turnOnModal('verify')">Verify vehicle</button>
+  <button class="btn btn-4" (click)="turnOnModal('search')">Search vehicles</button>
+</div>
+
+
+<div class="modal-backdrop" *ngIf="stolen">
+  <div class="modal-window">
+    <h2> Please input registration </h2>
+    <div class="driver-id-card">
+      <label for="stolenRegistration">Registration</label>
+      <input
+        type="text"
+        placeholder="Registration"
+        id="stolenRegistration"
+        name="registration"
+        required
+        [(ngModel)]="registration">
+
+    </div>
+    <button class="btn-2 btn" (click)="checkIfStolen(registration)">Submit</button>
+    <button class="close-btn" (click)="closeModal('stolen')">Close</button>
+  </div>
+</div>
+
+
+<div class="modal-backdrop" *ngIf="searchParam">
+  <div class="modal-window">
+    <h2> Please input information </h2>
+    <div class="driver-id-card">
+      <label for="markOfVehicle">Mark</label>
+      <input
+        type="text"
+        placeholder="Mark"
+        id="markOfVehicle"
+        name="markOfVehicle"
+        required
+        [(ngModel)]="markOfVehicle">
+
+      <label for="modelOfVehicle">Model</label>
+      <input
+        type="text"
+        placeholder="Model"
+        id="modelOfVehicle"
+        name="modelOfVehicle"
+        required
+        [(ngModel)]="modelOfVehicle">
+
+      <label for="colorOfVehicle">Color</label>
+      <input
+        type="text"
+        placeholder="Color"
+        id="colorOfVehicle"
+        name="colorOfVehicle"
+        required
+        [(ngModel)]="colorOfVehicle">
+
+
+      <label for="vehicleRegistration">Registration</label>
+      <input
+        type="text"
+        placeholder="Registration"
+        id="vehicleRegistration"
+        name="vehicleRegistration"
+        required
+        [(ngModel)]="registration">
+
+    </div>
+    <button class="btn-1 btn" (click)="searchByParams(markOfVehicle, modelOfVehicle, colorOfVehicle, registration)">Submit</button>
+    <button class="close-btn" (click)="closeModal('search')">Close</button>
+  </div>
+</div>
+
+
+
+<div class="modal-backdrop" *ngIf="verification">
+  <div class="modal-window">
+    <h2> Please input jmbg and registration </h2>
+    <div class="driver-id-card">
+      <label for="jmbg">Jmbg</label>
+      <input type="text" placeholder="jmbg" id="jmbg" name="jmbg" required [(ngModel)]="jmbg">
+      <label for="registration">Registration</label>
+      <input type="text" placeholder="Registration" id="registration" name="registration" required [(ngModel)]="registration">
+    </div>
+    <button class="btn-1 btn" (click)="sendVerificationRequest(jmbg, registration)">Submit</button>
+    <button class="close-btn" (click)="closeModal('verification')">Close</button>
+  </div>
+</div>
+
+
+
+<div class="cards-container" *ngIf="searchedVehicles.length > 0">
+  <div class="vehicle-card" *ngFor="let vehicle of searchedVehicles">
+    <div class="vehicle-header">
+      <h3>{{ vehicle.registration }}</h3>
+      <p class="model">{{ vehicle.mark }} {{ vehicle.model }}</p>
+    </div>
+
+    <div class="vehicle-body">
+      <p><strong>Year:</strong> {{ vehicle.year }}</p>
+      <p><strong>Color:</strong> {{ vehicle.color }}</p>
+      <p><strong>Stolen:</strong> {{ vehicle.stolen ? 'Yes' : 'No' }}</p>
+    </div>
+
+    <div class="vehicle-actions">
+      <button class="btn danger" (click)="showHistory(vehicle)">Show history</button>
+      <button class="btn danger" *ngIf="!vehicle.stolen" (click)="reportAsStolen(vehicle)">Report as stolen</button>
+      <button class="btn-2" (click)="newViolation(vehicle)">New violation</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="history-container" *ngIf="history.length > 0">
+  <h2>Ownership History for {{ registration }}</h2>
+  <div class="transfer-card" *ngFor="let transfer of history">
+    <p><strong>Date:</strong> {{ transfer.dateOfTransfer | date:'short' }}</p>
+    <p><strong>Vehicle:</strong> {{ transfer.vehicle.mark }} {{ transfer.vehicle.model }} ({{ transfer.vehicle.registration }})</p>
+
+    <p><strong>Old Owner:</strong> {{ transfer.ownerOld.firstName }} {{ transfer.ownerOld.lastName }} ({{ transfer.ownerOld.jmbg }})</p>
+    <p><strong>New Owner:</strong> {{ transfer.ownerNew.firstName }} {{ transfer.ownerNew.lastName }} ({{ transfer.ownerNew.jmbg }})</p>
+  </div>
+</div>

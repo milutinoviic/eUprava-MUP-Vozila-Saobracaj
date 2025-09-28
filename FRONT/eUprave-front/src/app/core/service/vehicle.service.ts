@@ -16,4 +16,26 @@ export class VehicleService {
     return this.http.get<VehicleDTO[]>(this.route.VEHICLES_DRIVER(driverId));
   }
 
+  sendVerification(req: any): Observable<string> {
+    return this.http.post(this.route.VEHICLE_VERIFY, req, {
+      responseType: 'text'
+    });
+  }
+
+
+  seeIfStolen(req: string): Observable<string> {
+    return this.http.get(this.route.VEHICLE_STOLEN_CHECK(req), {
+      responseType: 'text'
+    });
+  }
+  searchVehicles(req: any): Observable<VehicleDTO[]> {
+    return this.http.post<VehicleDTO[]>(this.route.VEHICLE_SEARCH, req);
+  }
+
+  reportAsStolen(reg: string): Observable<void> {
+    return this.http.post<void>(this.route.VEHICLE_REPORT_STOLEN(reg), {});
+  }
+
+
+
 }

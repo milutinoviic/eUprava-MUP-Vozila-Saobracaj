@@ -1,8 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {OwnerDTO, OwnerIdDTO, PoliceDTO, VehicleDTO} from '../../core/type/auth.types';
+import {Fine, OwnerDTO, OwnerIdDTO, PoliceDTO, VehicleDTO, Violation} from '../../core/type/auth.types';
 import {ToastrService} from 'ngx-toastr';
 import {OwnerService} from '../../core/service/owner.service';
 import {VehicleService} from '../../core/service/vehicle.service';
+import {ViolationService} from '../../core/service/violation.service';
+import {FineService} from '../../core/service/fine.service';
 
 @Component({
   selector: 'app-owner-list',
@@ -17,14 +19,20 @@ export class OwnerListComponent implements OnInit{
   isOn: boolean = true;
    query = '';
   ownersVehicles: VehicleDTO[] = [];
+  ownersViolations: Violation[] = [];
+  selectedViolation: Violation | undefined;
+  selectedFine: Fine | undefined;
 
-  constructor(private toastr: ToastrService, private ownerService: OwnerService, private vehicleService: VehicleService) {
+  constructor(private toastr: ToastrService, private ownerService: OwnerService, private vehicleService: VehicleService, private violationService: ViolationService,
+  private fineService: FineService
+  ) {
   }
 
   closeModal() {
     this.selectedOwner = undefined;
     this.isOn = true;
     this.selectedId = undefined;
+    this.selectedViolation = undefined;
   }
 
   showDriverId(owner: OwnerDTO) {
@@ -61,12 +69,34 @@ export class OwnerListComponent implements OnInit{
   }
 
   showViolations(owner: OwnerDTO) {
+    const ownerId = owner.id; // or owner.jmbg depending on API
+    if (!ownerId) {
+      console.warn('Owner ID not found for violations:', owner);
+      return;
+    }
 
+    this.violationService.fetchViolations(ownerId).subscribe({
+      next: (violations: Violation[]) => {
+        if (!violations || violations.length === 0) {
+          this.toastr.info('No violations found for this owner.');
+          return;
+        }
+        this.ownersViolations = violations;
+        this.isOn = false; // hide main cards container
+        console.log('Fetched violations:', violations);
+      },
+      error: (err) => {
+        console.error('Error fetching violations:', err);
+        this.toastr.error('Failed to fetch violations');
+      }
+    });
   }
+
 
   fetchOwners() {
     this.isOn = true;
     this.ownersVehicles = [];
+    this.ownersViolations = [];
     this.ownerService.getAllOwners().subscribe({
       next: data => {
         this.owners = data;
@@ -80,5 +110,15 @@ export class OwnerListComponent implements OnInit{
 
   ngOnInit(): void {
     this.fetchOwners();
+  }
+
+
+  seeFine(viol: Violation) {
+    this.fineService.fetchFine(viol.id).subscribe({
+      next: value => {
+        this.selectedFine = value;
+        this.selectedViolation = viol;
+      }
+    })
   }
 }

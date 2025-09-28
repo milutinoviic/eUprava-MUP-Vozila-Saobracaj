@@ -50,11 +50,44 @@
       <p><strong>Color:</strong> {{ vehicle.color }}</p>
       <p><strong>Registration:</strong> {{ vehicle.registration }}</p>
       <p><strong>Year:</strong> {{vehicle.year}}</p>
-      <p><strong>Stolen:</strong> {{vehicle.isStolen ? 'Y' : 'N'}}</p>
+      <p><strong>Stolen:</strong> {{vehicle.stolen ? 'Y' : 'N'}}</p>
     </div>
 
     <div class="owner-actions">
 
     </div>
+  </div>
+</div>
+
+
+<div class="cards-container" *ngIf="ownersViolations.length > 0">
+  <div class="owner-card" *ngFor="let viol of ownersViolations">
+    <div class="owner-header">
+      <h3>{{ viol.typeOfViolation }}</h3>
+      <p class="date">{{ viol.date }}</p>
+    </div>
+    <div class="owner-body">
+      <p><strong>Location:</strong> {{ viol.location }}</p>
+    </div>
+
+    <div class="owner-actions">
+      <button class="btn primary" (click)="seeFine(viol)">See Fine</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal-backdrop" *ngIf="selectedViolation">
+  <div class="modal-window">
+    <h2>Fine {{selectedFine?.id}}</h2>
+    <div class="driver-id-card">
+      <p><strong>Amount:</strong> {{ selectedFine?.amount }}</p>
+      <p><strong>Paid:</strong> {{ selectedFine?.paid ? 'Y' : 'N' }}</p>
+      <div *ngIf="selectedFine?.paid">
+      <p><strong>Date of payment:</strong> {{ selectedFine?.date }}</p>
+      </div>
+    </div>
+    <button class="close-btn" (click)="closeModal()">Close</button>
   </div>
 </div>

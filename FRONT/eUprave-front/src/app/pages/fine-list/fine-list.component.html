@@ -1,0 +1,18 @@
+<div class="cards-container" *ngIf="isOn">
+  <div class="owner-card" *ngFor="let fine of fines">
+    <div class="owner-header">
+      <h3>Fine {{ fine.id }}</h3>
+      <p class="date">{{ fine.date }}</p>
+    </div>
+    <div class="owner-body">
+      <p><strong>Amount:</strong> {{ fine.amount }}</p>
+      <p><strong>Paid:</strong> {{ fine.paid ? 'Y' : 'N' }}</p>
+    </div>
+
+    <div class="owner-actions">
+<!--      <button class="btn primary" (click)="showDriverId(owner)">See Driver ID</button>-->
+<!--      <button class="btn secondary" (click)="showVehicles(owner)">See Vehicles</button>-->
+<!--      <button class="btn danger" (click)="showViolations(owner)">See Violations</button>-->
+    </div>
+  </div>
+</div>

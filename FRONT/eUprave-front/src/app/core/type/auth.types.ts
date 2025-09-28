@@ -42,7 +42,7 @@ export interface PoliceDTO {
 }
 
 export interface StatisticDTO {
-  date: Date;
+  date: string;
   numberOfViolations: number;
 }
 
@@ -71,7 +71,40 @@ export interface VehicleDTO {
   registration: string;
   year: number;
   color: string;
-  isStolen: boolean;
+  stolen: boolean;
   ownerId: string;
 
+}
+
+export interface Violation {
+  id: string;
+  typeOfViolation: TypeOfViolation;
+  date: string;
+  location: string;
+  driverId: string;
+  vehicleId: string;
+  policeId: string;
+
+}
+
+export enum TypeOfViolation {
+  MINOR = 'MINOR',
+  MAJOR = 'MAJOR',
+  CRITICAL = 'CRITICAL'
+}
+
+export interface Fine {
+  id: string;
+  amount: number;
+  paid: boolean;
+  date: string;
+  violationID: string;
+}
+
+export interface OwnershipTransferDTO {
+  id: string;
+  vehicle: VehicleDTO;
+  ownerOld: OwnerDTO;
+  ownerNew: OwnerDTO;
+  dateOfTransfer: string; // JSON gives you string anyway
 }
