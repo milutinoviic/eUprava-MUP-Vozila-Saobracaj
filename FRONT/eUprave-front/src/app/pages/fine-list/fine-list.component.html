@@ -10,7 +10,7 @@
     </div>
 
     <div class="owner-actions">
-<!--      <button class="btn primary" (click)="showDriverId(owner)">See Driver ID</button>-->
+      <button class="btn primary" *ngIf="!fine.paid" (click)="markAsPaid(fine)">Mark as paid</button>
 <!--      <button class="btn secondary" (click)="showVehicles(owner)">See Vehicles</button>-->
 <!--      <button class="btn danger" (click)="showViolations(owner)">See Violations</button>-->
     </div>

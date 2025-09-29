@@ -19,6 +19,7 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { OwnerListComponent } from './pages/owner-list/owner-list.component';
 import { FineListComponent } from './pages/fine-list/fine-list.component';
 import { VehicleListComponent } from './pages/vehicle-list/vehicle-list.component';
+import { ViolationListComponent } from './pages/violation-list/violation-list.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { VehicleListComponent } from './pages/vehicle-list/vehicle-list.componen
     TrafficPoliceMainComponent,
     OwnerListComponent,
     FineListComponent,
-    VehicleListComponent, // PoliceListComponent removed
+    VehicleListComponent,
+    ViolationListComponent, // PoliceListComponent removed
   ],
   imports: [
     BrowserModule,

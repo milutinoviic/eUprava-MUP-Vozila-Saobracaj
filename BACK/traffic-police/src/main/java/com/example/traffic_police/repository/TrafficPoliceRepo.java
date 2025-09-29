@@ -3,10 +3,12 @@ package com.example.traffic_police.repository;
 import com.example.traffic_police.model.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.ConvertOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -100,7 +102,7 @@ public class TrafficPoliceRepo {
     }
 
     public void assignOfficerToViolation(String violationId, String officerId) {
-        Query query = new Query(Criteria.where("id").is(violationId));
+        Query query = new Query(Criteria.where("_id").is(violationId));
         Update update = new Update().set("policeId", officerId);
         mongoTemplate.updateFirst(query, update, Violation.class);
     }
@@ -113,15 +115,23 @@ public class TrafficPoliceRepo {
     public List<Fine> findUnpaidFinesByDriverId(String driverId) {
         Aggregation agg = Aggregation.newAggregation(
                 Aggregation.match(Criteria.where("driverId").is(driverId)),
-                Aggregation.lookup("fines", "id", "violationID", "fines"),
+                Aggregation.addFields()
+                        .addField("violationIdStr")
+                        .withValue(ConvertOperators.ToString.toString("$_id"))
+                        .build(),
+                Aggregation.lookup("fines", "violationIdStr", "violationID", "fines"),
                 Aggregation.unwind("fines"),
                 Aggregation.match(Criteria.where("fines.isPaid").is(false)),
-                Aggregation.project().and("fines").as("fines")
+                Aggregation.replaceRoot("fines") // makes "fines" the root document
         );
 
-        AggregationResults<FineWrapper> results = mongoTemplate.aggregate(agg, "violations", FineWrapper.class);
-        return results.getMappedResults().stream().map(FineWrapper::getFine).toList();
+        AggregationResults<Fine> results =
+                mongoTemplate.aggregate(agg, "violations", Fine.class);
+
+        return results.getMappedResults();
     }
+
+
 
     public List<Violation> getViolationHistory(String driverId) {
         Query query = new Query(Criteria.where("driverId").is(driverId));

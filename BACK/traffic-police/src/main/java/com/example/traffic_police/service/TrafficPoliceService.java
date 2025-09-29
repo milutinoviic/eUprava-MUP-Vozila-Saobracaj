@@ -48,5 +48,6 @@ public interface TrafficPoliceService {
     DriverIDDTO searchDriverIDByDriverId(String driverId);
     List<VehicleDTO> findAllVehicles(String driverId);
 
+    OwnerDTO getById(String id);
 
 }

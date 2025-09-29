@@ -23,7 +23,7 @@
   </div>
   <div>
     <label for="lName">Last name:</label>
-    <input type="text" id="lName" formControlName="lName" placeholder="lName">
+    <input type="text" id="lName" formControlName="lName" placeholder="Last name">
     <div *ngIf="registrationForm.get('lName')?.touched">
       <p *ngIf="registrationForm.get('lName')?.errors?.['required']">Last name is required</p>
     </div>

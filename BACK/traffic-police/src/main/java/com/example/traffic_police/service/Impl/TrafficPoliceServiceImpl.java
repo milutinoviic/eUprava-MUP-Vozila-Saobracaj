@@ -7,6 +7,7 @@ import com.example.traffic_police.service.TrafficPoliceService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -26,12 +28,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class TrafficPoliceServiceImpl implements TrafficPoliceService {
 
     private final TrafficPoliceRepo repo;
     private final RestTemplate restTemplate;
     private final String mupBaseUrl;
+    private final WebClient.Builder webClientBuilder;
 
     @Value("${mup.service.url}")
     private String mupServiceUrl;
@@ -56,12 +60,13 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
             TrafficPoliceRepo repo,
             RestTemplate restTemplate,
             @Value("${mup.service.url}") String mupBaseUrl,
-            JavaMailSender mailSender
-    ) {
+            JavaMailSender mailSender,
+            WebClient.Builder webClientBuilder) {
         this.repo = repo;
         this.restTemplate = restTemplate;
         this.mupBaseUrl = mupBaseUrl;
         this.mailSender = mailSender;
+        this.webClientBuilder = webClientBuilder;
     }
 
     // ------------------ POLICE ------------------
@@ -294,29 +299,34 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
 
     @Override
     public List<OwnerDTO> handleDriverSuspension(SuspendDriverIdRequest dto) {
-        String url = mupBaseUrl + "/driverIds/suspendDriverId";
+        // Build WebClient with base URL
+        WebClient webClient = webClientBuilder
+                .baseUrl(mupBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
 
-        HttpHeaders headers = getAuthHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        // Send PATCH request
+        webClient.patch()
+                .uri("/driverIds/suspendDriverId")
+                .headers(headers -> headers.addAll(getAuthHeaders()))
+                .bodyValue(dto)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
 
-        HttpEntity<SuspendDriverIdRequest> entity = new HttpEntity<>(dto, headers);
-
-        restTemplate.exchange(url, HttpMethod.PATCH, entity, Void.class);
-
-
-        restTemplate.patchForObject(url, entity, Void.class);
 
         return fetchAllDrivers();
     }
+
 
     @Override
     public List<OwnerDTO> handleNewViolation(NewViolationRequest dto) {
         Violation v = insertViolation(dto.getViolation());
 
         try {
-            notifyPersonOfViolation(dto.getViolation(), dto.getOwner());
+            notifyPersonOfViolation(dto.getViolation(), dto.getDriverId().getOwner());
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            log.error("Failed to notify person of violation", e);
         }
 
         int points;
@@ -430,6 +440,16 @@ public class TrafficPoliceServiceImpl implements TrafficPoliceService {
         return response.getBody();
     }
 
+    @Override
+    public OwnerDTO getById(String id) {
+        String url = mupBaseUrl + "/owners/id/" + id;
+        ResponseEntity<OwnerDTO> response = restTemplate.exchange(url, HttpMethod.GET, getVoidHttpEntity(), OwnerDTO.class);
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            log.error("No owner found for id: " + id);
+        }
+
+        return response.getBody();
+    }
 
 
     private static String getMessage(String raw) {

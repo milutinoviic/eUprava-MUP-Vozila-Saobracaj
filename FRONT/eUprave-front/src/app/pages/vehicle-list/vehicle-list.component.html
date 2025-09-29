@@ -106,7 +106,7 @@
     <div class="vehicle-actions">
       <button class="btn danger" (click)="showHistory(vehicle)">Show history</button>
       <button class="btn danger" *ngIf="!vehicle.stolen" (click)="reportAsStolen(vehicle)">Report as stolen</button>
-      <button class="btn-2" (click)="newViolation(vehicle)">New violation</button>
+      <button class="btn-2" (click)="newViolationModal(vehicle)">New violation</button>
     </div>
   </div>
 </div>
@@ -122,3 +122,41 @@
     <p><strong>New Owner:</strong> {{ transfer.ownerNew.firstName }} {{ transfer.ownerNew.lastName }} ({{ transfer.ownerNew.jmbg }})</p>
   </div>
 </div>
+
+
+<div class="modal-backdrop" *ngIf="chosenVehicle">
+  <div class="modal-card">
+    <header class="modal-header">
+      <h2>Create Violation</h2>
+      <button class="close-btn" (click)="closeModal('violation')">&times;</button>
+    </header>
+
+    <form class="violation-form" (ngSubmit)="createViolation()">
+      <div class="form-group">
+        <label for="typeOfViolation">Violation Type</label>
+        <select id="typeOfViolation" [(ngModel)]="typeOfViolation" name="typeOfViolation" required>
+          <option [ngValue]="null" disabled selected>Select type</option>
+          <option *ngFor="let type of violationTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input type="datetime-local" id="date" name="date" required [(ngModel)]="date">
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" required placeholder="Location" [(ngModel)]="location">
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="urgent" name="urgent" [(ngModel)]="checkYourself">
+        <label for="urgent">Assign yourself</label>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+

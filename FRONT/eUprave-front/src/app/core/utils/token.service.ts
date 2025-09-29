@@ -9,7 +9,7 @@ export class TokenService {
   private jwtHelper = new JwtHelperService();
 
   getToken(): string | null {
-    return localStorage.getItem('authToken'); 
+    return localStorage.getItem('authToken');
   }
 
   getDecodedToken(): any | null {
@@ -23,7 +23,7 @@ export class TokenService {
   }
 
   getUserEmail(): string | null {
-    return this.getDecodedToken()?.sub || null; 
+    return this.getDecodedToken()?.sub || null;
   }
 
   getUserRole(): string | null {

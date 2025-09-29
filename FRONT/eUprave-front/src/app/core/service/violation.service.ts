@@ -16,4 +16,23 @@ export class ViolationService {
   }
 
 
+  createViolation(violation: any):Observable<void> {
+    return this.http.post<void>(this.route.VIOLATIONS_ADD, violation);
+
+  }
+
+  fetchViolationsByPolice(policeId: string): Observable<Violation[]> {
+    return this.http.get<Violation[]>(this.route.VIOLATIONS_BY_POLICE(policeId));
+  }
+
+  fetchAllViolations(): Observable<Violation[]> {
+    return this.http.get<Violation[]>(this.route.VIOLATIONS_ALL);
+  }
+
+  assignOfficer(id: string, selectedOfficerId: string): Observable<void> {
+    return this.http.patch<void>(this.route.VIOLATIONS_ASSIGN(selectedOfficerId, id), {});
+  }
+
+
 }
+

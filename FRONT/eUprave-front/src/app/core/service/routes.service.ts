@@ -34,7 +34,7 @@ export class RoutesService {
   public readonly OWNERS_HISTORY = (registration: string) =>
     `${this._traffic_api_url}/owners/history/${registration}`;
   public readonly OWNERS_ID = (id: string) => `${this._traffic_api_url}/owners/id/${id}`;
-
+  public readonly OWNERS_BY_ID = (id: string) => `${this._traffic_api_url}/owners/${id}`;
   // =====================
   // POLICE
   // =====================

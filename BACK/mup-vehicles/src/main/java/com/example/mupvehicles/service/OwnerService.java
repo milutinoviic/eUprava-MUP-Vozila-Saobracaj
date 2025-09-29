@@ -2,6 +2,7 @@ package com.example.mupvehicles.service;
 
 import com.example.mupvehicles.dto.CreateOwnerDto;
 import com.example.mupvehicles.dto.OwnerDto;
+import com.example.mupvehicles.model.Owner;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface OwnerService {
     void deleteOwner(String ownerId);
 
     List<OwnerDto> getAllOwners();
+
+    OwnerDto getOwnerById(String ownerId);
 }

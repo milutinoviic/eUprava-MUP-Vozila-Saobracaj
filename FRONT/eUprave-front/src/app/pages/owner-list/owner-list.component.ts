@@ -22,6 +22,7 @@ export class OwnerListComponent implements OnInit{
   ownersViolations: Violation[] = [];
   selectedViolation: Violation | undefined;
   selectedFine: Fine | undefined;
+  unpaidFines: Fine[] = [];
 
   constructor(private toastr: ToastrService, private ownerService: OwnerService, private vehicleService: VehicleService, private violationService: ViolationService,
   private fineService: FineService
@@ -120,5 +121,30 @@ export class OwnerListComponent implements OnInit{
         this.selectedViolation = viol;
       }
     })
+  }
+
+  getUnpaidFines(owner: OwnerDTO) {
+    const ownerId = owner.id;
+    if (!ownerId) {
+      console.warn('Owner ID not found for violations:', owner);
+      return;
+    }
+
+    this.fineService.fetchUnpaidFines(ownerId).subscribe({
+      next: (value) => {
+        if (!value || value.length === 0) {
+          this.toastr.info('No unpaid fines found for this owner.');
+          return;
+        }
+        this.unpaidFines = value;
+        this.isOn = false; // hide main cards container
+        this.ownersViolations = [];
+        console.log('Fetched fines:', value);
+      },
+      error: (err) => {
+        console.error('Error fetching fines:', err);
+        this.toastr.error('Failed to fetch fines');
+      }
+    });
   }
 }

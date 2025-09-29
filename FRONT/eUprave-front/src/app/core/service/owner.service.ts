@@ -18,4 +18,8 @@ export class OwnerService {
   getDriverIdByOwner(driverId: string): Observable<OwnerIdDTO> {
     return this.http.get<OwnerIdDTO>(this.route.OWNERS_ID(driverId));
   }
+
+  getOwnerById(id: string): Observable<OwnerDTO> {
+    return this.http.get<OwnerDTO>(this.route.OWNERS_BY_ID(id));
+  }
 }

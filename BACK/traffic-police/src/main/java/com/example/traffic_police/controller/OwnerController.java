@@ -31,4 +31,9 @@ public class OwnerController {
     public ResponseEntity<DriverIDDTO> getDriverID(@PathVariable String jmbg) {
         return ResponseEntity.ok(trafficPoliceService.searchDriverIDByDriverId(jmbg));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OwnerDTO> getOwner(@PathVariable String id) {
+        return ResponseEntity.ok(trafficPoliceService.getById(id));
+    }
 }

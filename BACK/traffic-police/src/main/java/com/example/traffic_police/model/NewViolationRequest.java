@@ -11,7 +11,6 @@ import lombok.Setter;
 @Setter
 public class NewViolationRequest {
     private Violation violation;
-    private OwnerDTO owner;
     private DriverIDDTO driverId;
 
 }

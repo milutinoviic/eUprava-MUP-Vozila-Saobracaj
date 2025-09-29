@@ -1,0 +1,59 @@
+<div class="cards-container" *ngIf="ownersViolations.length > 0">
+  <div class="owner-card" *ngFor="let viol of ownersViolations">
+    <div class="owner-header">
+      <h3>{{ viol.typeOfViolation }}</h3>
+      <p class="date">{{ viol.date }}</p>
+    </div>
+    <div class="owner-body">
+      <p><strong>Location:</strong> {{ viol.location }}</p>
+    </div>
+
+    <div class="owner-actions">
+      <button class="btn primary" (click)="seeFine(viol)">See Fine</button>
+      <button class="btn primary" *ngIf="!viol.policeId && rank !== Rank.LOW" (click)="assignToOfficer(viol)">Assign to an officer</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal-backdrop" *ngIf="selectedFine">
+  <div class="modal-window">
+    <h2>Fine {{selectedFine.id}}</h2>
+    <div class="driver-id-card">
+      <p><strong>Amount:</strong> {{ selectedFine.amount }}</p>
+      <p><strong>Paid:</strong> {{ selectedFine.paid ? 'Y' : 'N' }}</p>
+      <div *ngIf="selectedFine?.paid">
+        <p><strong>Date of payment:</strong> {{ selectedFine.date }}</p>
+
+      </div>
+    </div>
+    <button class="btn primary" *ngIf="!selectedFine.paid" (click)="markAsPaid(selectedFine)">Mark as paid</button>
+    <button class="close-btn" (click)="closeModal()">Close</button>
+  </div>
+
+</div>
+
+
+<div class="modal-backdrop" *ngIf="selectedViolationForAssignment">
+  <div class="modal-window">
+    <h2>Assign Officer</h2>
+
+    <div class="form-group">
+      <label for="officerSelect">Select Officer</label>
+      <select id="officerSelect" [(ngModel)]="selectedOfficerId" name="selectedOfficerId">
+        <option [ngValue]="null" disabled selected>Select officer</option>
+        <option *ngFor="let officer of police" [value]="officer.id">
+          {{ officer.firstName }} {{ officer.lastName }}
+        </option>
+      </select>
+
+    </div>
+
+    <div class="form-actions">
+      <button class="btn primary" (click)="assignOfficerToViolation()">Assign</button>
+      <button class="close-btn" (click)="closeAssignmentModal()">Close</button>
+    </div>
+  </div>
+</div>
+

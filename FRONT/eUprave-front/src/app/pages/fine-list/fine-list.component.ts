@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Fine, Rank } from '../../core/type/auth.types';
+import {Fine, Rank, Violation} from '../../core/type/auth.types';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { TokenService } from '../../core/utils/token.service';
@@ -18,6 +18,7 @@ export class FineListComponent implements OnInit {
   fines: Fine[] = [];
   public rank: Rank | undefined;
   public role: string | null | undefined;
+
 
   constructor(
     private http: HttpClient,
@@ -45,11 +46,7 @@ export class FineListComponent implements OnInit {
           console.log('User rank:', this.rank);
 
           // Only fetch fines if rank is HIGH
-          if (this.rank === Rank.HIGH) {
-            this.fetchFines();
-          } else {
-            console.warn('User rank is not HIGH, cannot fetch fines.');
-          }
+          this.decideForRank(this.rank);
         },
         error: (err) => {
           console.error('Error fetching rank:', err);
@@ -58,6 +55,14 @@ export class FineListComponent implements OnInit {
       });
     } else {
       console.warn('User role is not POLICE, cannot fetch fines.');
+    }
+  }
+
+  decideForRank(rank: Rank): void {
+    if (rank !== Rank.LOW) {
+      this.fetchFines();
+    } else {
+      this.fetchOfficersFines();
     }
   }
 
@@ -77,4 +82,39 @@ export class FineListComponent implements OnInit {
       }
     });
   }
+
+  private fetchOfficersFines(): void {
+    const officerId = this.token.getUserId();
+    if (!officerId) {
+      this.toastr.error('No user found.');
+      return;
+    }
+
+    this.violationService.fetchViolationsByPolice(officerId.toString()).subscribe({
+      next: (violations: Violation[]) => {
+        this.fineService.fetchFinesByPolice(violations).subscribe({
+          next: (fines: Fine[]) => {
+            this.fines = fines;
+          },
+          error: () => this.toastr.error('Could not fetch fines')
+        });
+      },
+      error: () => this.toastr.error('Could not fetch violations')
+    });
+  }
+
+
+  markAsPaid(fine: Fine) {
+    this.fineService.markAsPaid(fine.id).subscribe({
+      next: () => {
+        this.toastr.success('Fine is marked as paid');
+        this.decideForRank(this.rank!);
+      },
+      error: () => {
+        this.toastr.error("There has been an error");
+      }
+    })
+  }
+
+
 }

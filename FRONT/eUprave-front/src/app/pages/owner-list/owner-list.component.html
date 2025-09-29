@@ -18,6 +18,7 @@
       <button class="btn primary" (click)="showDriverId(owner)">See Driver ID</button>
       <button class="btn secondary" (click)="showVehicles(owner)">See Vehicles</button>
       <button class="btn danger" (click)="showViolations(owner)">See Violations</button>
+      <button class="btn secondary" (click)="getUnpaidFines(owner)">Get unpaid fines</button>
     </div>
   </div>
 </div>
@@ -33,7 +34,7 @@
       <p><strong>Address:</strong> {{ selectedOwner?.address }}</p>
       <p><strong>Email:</strong> {{ selectedOwner?.email }}</p>
       <p><strong>Number of violations:</strong>{{selectedId.numberOfViolationPoints}}</p>
-      <p><strong>Suspended:</strong> {{ selectedId.isSuspended ? 'Y' : 'N' }}</p>
+      <p><strong>Suspended:</strong> {{ selectedId.suspended ? 'Y' : 'N' }}</p>
     </div>
     <button class="close-btn" (click)="closeModal()">Close</button>
   </div>
@@ -89,5 +90,18 @@
       </div>
     </div>
     <button class="close-btn" (click)="closeModal()">Close</button>
+  </div>
+</div>
+
+
+<div class="cards-container" *ngIf="unpaidFines.length > 0">
+  <div class="owner-card" *ngFor="let fine of unpaidFines">
+    <div class="owner-header">
+      <h2>Fine {{fine.id}}</h2>
+    </div>
+    <div class="owner-body">
+      <p><strong>Amount:</strong> {{ fine.amount }}</p>
+    </div>
+
   </div>
 </div>

@@ -57,7 +57,7 @@ export interface OwnerDTO {
 
 export interface OwnerIdDTO {
   id: string;
-  isSuspended: boolean;
+  suspended: boolean;
   numberOfViolationPoints: number;
   picture: string;
   owner: OwnerDTO;

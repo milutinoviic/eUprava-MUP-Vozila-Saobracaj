@@ -43,4 +43,10 @@ public class OwnerController {
     }
 
 
+    @GetMapping("/id/{id}")
+    public ResponseEntity<OwnerDto> getOwnerById(@PathVariable String id) {
+        return new ResponseEntity<>(ownerService.getOwnerById(id), HttpStatus.OK);
+    }
+
+
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {RoutesService} from './routes.service';
-import {forkJoin, Observable} from 'rxjs';
+import {forkJoin, map, Observable} from 'rxjs';
 import {Fine, Violation} from '../type/auth.types';
 
 @Injectable({
@@ -25,6 +25,16 @@ export class FineService {
     );
 
     return forkJoin(requests);
+  }
+
+
+
+  fetchUnpaidFines(jmbg: string): Observable<Fine[]> {
+    return this.http.get<Fine[]>(this.route.FINES_UNPAID(jmbg));
+  }
+
+  markAsPaid(fineId: string): Observable<void> {
+    return this.http.patch<void>(this.route.FINES_UPDATE(fineId), {});
   }
 
 }

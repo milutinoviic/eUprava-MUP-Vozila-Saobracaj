@@ -109,4 +109,10 @@ public class OwnerServiceImpl implements OwnerService {
         return  ownerMapper.convertOwnersToOwnerDtos(ownerList);
     }
 
+    @Override
+    public OwnerDto getOwnerById(String ownerId) {
+        Optional<Owner> owner = ownerRepository.findById(ownerId);
+        return owner.map(ownerMapper::convertOwnerToOwnerDto).orElse(null);
+    }
+
 }
