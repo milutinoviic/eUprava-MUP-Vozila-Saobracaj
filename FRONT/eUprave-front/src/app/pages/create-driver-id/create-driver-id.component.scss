@@ -1,0 +1,69 @@
+.create-driver-id {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.create-driver-id h3 {
+  margin-top: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.create-driver-id form div {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.create-driver-id label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.create-driver-id input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.create-driver-id input:focus {
+  border-color: #3f51b5;
+  outline: none;
+}
+
+.create-driver-id button {
+  width: 100%;
+  padding: 12px;
+  background-color: #3f51b5;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.create-driver-id button:hover {
+  background-color: #303f9f;
+}
+
+.create-driver-id pre {
+  background-color: #e8eaf6;
+  padding: 15px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.create-driver-id div[style*="color: red"] {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 600;
+}

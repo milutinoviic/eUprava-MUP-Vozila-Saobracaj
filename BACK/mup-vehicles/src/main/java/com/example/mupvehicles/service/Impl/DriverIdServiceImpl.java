@@ -11,7 +11,14 @@ import com.example.mupvehicles.repository.OwnerRepository;
 import com.example.mupvehicles.service.DriverIdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
@@ -33,7 +40,7 @@ public class DriverIdServiceImpl implements DriverIdService {
 
         Owner owner = ownerRepository.findByJmbg(createDriverIdDto.getOwnerJmbg());
 
-        if (!ownerRepository.existsByJmbg(owner.getJmbg())) {
+        if (owner == null) {
             throw new RuntimeException("Owner does not exist");
         }
 
@@ -41,17 +48,35 @@ public class DriverIdServiceImpl implements DriverIdService {
             throw new RuntimeException("DriverId already exists for this owner");
         }
 
-        DriverId driverId = new DriverId();
-        driverId.setId(UUID.randomUUID().toString());
-        driverId.setSuspended(false);
-        driverId.setNumberOfViolationPoints(0);
-        driverId.setPicture("");
-        driverId.setOwner(owner);
+        MultipartFile file = createDriverIdDto.getPicture();
 
-        driverIdRepository.save(driverId);
+        try {
 
-        return driverIdMapper.convertDriverIdToDto(driverId);
+            String uploadDir = "src/main/resources/Images";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
 
+
+            String imageName = "driver_" + owner.getJmbg() + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir, imageName).normalize();
+
+
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            DriverId driverId = new DriverId();
+            driverId.setId(UUID.randomUUID().toString());
+            driverId.setSuspended(false);
+            driverId.setNumberOfViolationPoints(0);
+            driverId.setPicture("/Images/" + imageName);
+            driverId.setOwner(owner);
+
+            driverIdRepository.save(driverId);
+
+            return driverIdMapper.convertDriverIdToDto(driverId);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save picture", e);
+        }
     }
 
     @Override
