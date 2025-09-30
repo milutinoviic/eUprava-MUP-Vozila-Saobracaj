@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/driverIds")
+@CrossOrigin(origins = "http://localhost:4200/", maxAge = 3600)
 public class DriverIdController {
 
     private final DriverIdService driverIdService;

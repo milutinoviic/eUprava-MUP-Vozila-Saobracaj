@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/owners")
+@CrossOrigin(origins = "http://localhost:4200/", maxAge = 3600)
 public class OwnerController {
 
     private final OwnerService ownerService;
