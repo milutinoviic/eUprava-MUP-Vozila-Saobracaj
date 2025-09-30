@@ -17,9 +17,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AuthInterceptor} from './core/interceptor/auth.interceptor';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { OwnerListComponent } from './pages/owner-list/owner-list.component';
-import { FineListComponent } from './pages/fine-list/fine-list.component';
-import { VehicleListComponent } from './pages/vehicle-list/vehicle-list.component';
-import { ViolationListComponent } from './pages/violation-list/violation-list.component';
+import { CreateOwnerComponent } from './pages/create-owner/create-owner.component';
+import { CreateDriverIdComponent } from './pages/create-driver-id/create-driver-id.component';
 
 @NgModule({
   declarations: [
@@ -28,9 +27,8 @@ import { ViolationListComponent } from './pages/violation-list/violation-list.co
     HomeComponent,
     TrafficPoliceMainComponent,
     OwnerListComponent,
-    FineListComponent,
-    VehicleListComponent,
-    ViolationListComponent, // PoliceListComponent removed
+    CreateOwnerComponent,
+    CreateDriverIdComponent, // PoliceListComponent removed
   ],
   imports: [
     BrowserModule,

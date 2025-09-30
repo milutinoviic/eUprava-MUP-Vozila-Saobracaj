@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/ownerTransfers")
+@CrossOrigin(origins = "http://localhost:4200/", maxAge = 3600)
 public class OwnershipTransferController {
 
     private final OwnershipTransferService ownershipTransferService;
