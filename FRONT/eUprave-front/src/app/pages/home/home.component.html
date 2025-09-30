@@ -6,6 +6,8 @@
   <button class="btn btn-3" *ngIf="rank == Rank.HIGH" (click)="goTo('police')">Police</button>
   <button class="btn btn-4" (click)="goTo('vehicles')">Vehicles</button>
   <button class="btn btn-5" (click)="goTo('violations')">Violations</button>
+  <button class="btn btn-5" *ngIf="rank == Rank.HIGH"  (click)="goTo('export')">Export</button>
+  <button class="btn btn-1" (click)="goTo('statistics')">Statistics</button>
 </div>
 
 

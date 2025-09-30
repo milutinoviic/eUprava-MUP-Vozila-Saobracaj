@@ -24,3 +24,11 @@
 <div *ngIf="currentSection === 'violations'">
   <app-violation-list></app-violation-list>
 </div>
+
+<div *ngIf="currentSection === 'export'">
+  <app-export-violations></app-export-violations>
+</div>
+
+<div *ngIf="currentSection === 'statistics'">
+  <app-daily-statistics></app-daily-statistics>
+</div>

@@ -17,11 +17,13 @@ public interface VehicleRepository extends JpaRepository<Vehicle, String> {
 
     List<Vehicle> findByOwnerJmbg(String jmbg);
 
-    @Query("SELECT v FROM Vehicle v " +
-            "WHERE (:mark IS NULL OR v.mark = :mark) " +
-            "AND (:model IS NULL OR v.model = :model) " +
-            "AND (:color IS NULL OR v.color = :color) " +
-            "AND (:registration IS NULL OR LOWER(v.registration) LIKE LOWER(CONCAT('%', :registration, '%')))")
+    @Query("""
+    SELECT v FROM Vehicle v
+    WHERE (:mark IS NULL OR v.mark = :mark)
+      AND (:model IS NULL OR v.model = :model)
+      AND (:color IS NULL OR v.color = :color)
+      AND (:registration IS NULL OR v.registration ILIKE %:registration%)
+    """)
     List<Vehicle> searchVehicles(
             @Param("mark") String mark,
             @Param("model") String model,

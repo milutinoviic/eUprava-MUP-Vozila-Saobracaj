@@ -34,5 +34,11 @@ export class ViolationService {
   }
 
 
+  exportViolations(selectedFormat: string, selectedPeriod: string): Observable<Blob> {
+    return this.http.get(this.route.VIOLATIONS_EXPORT(selectedFormat, selectedPeriod), {
+      responseType: 'blob'
+    });
+  }
+
 }
 

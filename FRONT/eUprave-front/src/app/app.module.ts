@@ -20,6 +20,8 @@ import { OwnerListComponent } from './pages/owner-list/owner-list.component';
 import { FineListComponent } from './pages/fine-list/fine-list.component';
 import { VehicleListComponent } from './pages/vehicle-list/vehicle-list.component';
 import { ViolationListComponent } from './pages/violation-list/violation-list.component';
+import { ExportViolationsComponent } from './pages/export-violations/export-violations.component';
+import { DailyStatisticsComponent } from './pages/daily-statistics/daily-statistics.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import { ViolationListComponent } from './pages/violation-list/violation-list.co
     OwnerListComponent,
     FineListComponent,
     VehicleListComponent,
-    ViolationListComponent, // PoliceListComponent removed
+    ViolationListComponent,
+    ExportViolationsComponent,
+    DailyStatisticsComponent, // PoliceListComponent removed
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,17 @@
+<div class="export-container">
+  <label>
+    Format:
+    <select [(ngModel)]="selectedFormat">
+      <option *ngFor="let f of formats" [value]="f">{{ f.toUpperCase() }}</option>
+    </select>
+  </label>
+
+  <label>
+    Period:
+    <select [(ngModel)]="selectedPeriod">
+      <option *ngFor="let p of periods" [value]="p.value">{{ p.label }}</option>
+    </select>
+  </label>
+
+  <button (click)="download()">Download</button>
+</div>

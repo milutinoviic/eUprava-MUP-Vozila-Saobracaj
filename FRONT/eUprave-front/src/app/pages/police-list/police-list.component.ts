@@ -140,7 +140,7 @@ export class PoliceListComponent implements OnInit {
     });
   }
 
-  seeStatistics(id: string) {
+  seeDailyStatistics(id: string) {
     this.service.statisticsOfficer(id).subscribe({
       next: (value) => {
         this.statistics = value;
@@ -149,21 +149,7 @@ export class PoliceListComponent implements OnInit {
           return;
         }
 
-        this.chartData = {
-          labels: this.statistics.map(s => s.date),
-          datasets: [
-            {
-              data: this.statistics.map(s => s.numberOfViolations),
-              label: 'Violations',
-              fill: true,
-              borderColor: '#3b82f6',
-              backgroundColor: 'rgba(59,130,246,0.2)',
-              tension: 0.25
-            }
-          ]
-        };
-
-        this.showModal = true;
+        this.showCharts();
       },
       error: (error) => {
         this.toastr.error(error);
@@ -171,7 +157,28 @@ export class PoliceListComponent implements OnInit {
     });
   }
 
+  showCharts() {
+    this.chartData = {
+      labels: this.statistics.map(s => s.date),
+      datasets: [
+        {
+          data: this.statistics.map(s => s.numberOfViolations),
+          label: 'Violations',
+          fill: true,
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.2)',
+          tension: 0.25
+        }
+      ]
+    };
+
+    this.showModal = true;
+  }
+
   closeModal() {
     this.showModal = false;
   }
+
+
+
 }

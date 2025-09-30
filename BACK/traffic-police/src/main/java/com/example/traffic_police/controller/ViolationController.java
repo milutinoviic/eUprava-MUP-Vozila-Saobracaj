@@ -5,6 +5,8 @@ import com.example.traffic_police.model.OwnerDTO;
 import com.example.traffic_police.model.Violation;
 import com.example.traffic_police.service.TrafficPoliceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +38,19 @@ public class ViolationController {
     }
 
     @GetMapping("/{format}/{period}")
-    public ResponseEntity<byte[]> getViolationsByFormat(@PathVariable String format, @PathVariable String period) {
-        return ResponseEntity.ok(trafficPoliceService.exportViolationData(format, period));
+    public ResponseEntity<byte[]> getViolationsByFormat(
+            @PathVariable String format,
+            @PathVariable String period) {
+
+        byte[] data = trafficPoliceService.exportViolationData(format, period);
+
+        String contentType = format.equalsIgnoreCase("pdf") ? "application/pdf" : "text/csv";
+        String fileName = "violations_" + period + "." + format;
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(data);
     }
 
     @PostMapping

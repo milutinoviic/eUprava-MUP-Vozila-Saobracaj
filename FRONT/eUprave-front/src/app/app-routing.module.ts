@@ -6,6 +6,8 @@ import { RegistrationComponent } from './pages/registration/registration.compone
 import { HomeComponent } from './pages/home/home.component';
 import { TrafficPoliceMainComponent } from './pages/traffic-police-main/traffic-police-main.component';
 import { PoliceListComponent } from './pages/police-list/police-list.component';
+import {ExportViolationsComponent} from './pages/export-violations/export-violations.component';
+import {DailyStatisticsComponent} from './pages/daily-statistics/daily-statistics.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
@@ -17,7 +19,9 @@ const routes: Routes = [
   { path: 'fines', component: TrafficPoliceMainComponent },
   { path: 'violations', component: TrafficPoliceMainComponent },
   { path: 'owners', component: TrafficPoliceMainComponent },
-  { path: 'police-list', component: PoliceListComponent } // ✅ route to standalone component
+  { path: 'police-list', component: PoliceListComponent },
+  { path: 'export', component: ExportViolationsComponent},
+  {path: 'statistics', component: DailyStatisticsComponent},
 ];
 
 @NgModule({

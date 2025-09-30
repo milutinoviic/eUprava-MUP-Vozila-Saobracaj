@@ -199,16 +199,30 @@ public class TrafficPoliceRepo {
 
     private LocalDateTime[] parsePeriod(String period) {
         LocalDateTime now = LocalDateTime.now();
+        LocalDate today = LocalDate.now();
+
         return switch (period) {
-            case "last7days" -> new LocalDateTime[]{now.minusDays(7), now};
-            case "last30days" -> new LocalDateTime[]{now.minusDays(30), now};
+            case "last7days" -> new LocalDateTime[]{
+                    now.minusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0),
+                    today.atTime(23, 59, 59)
+            };
+            case "last30days" -> new LocalDateTime[]{
+                    now.minusDays(30).withHour(0).withMinute(0).withSecond(0).withNano(0),
+                    today.atTime(23, 59, 59)
+            };
             case "thisMonth" -> {
-                LocalDate start = LocalDate.now().withDayOfMonth(1);
+                LocalDate start = today.withDayOfMonth(1);
                 LocalDate end = start.plusMonths(1).minusDays(1);
                 yield new LocalDateTime[]{start.atStartOfDay(), end.atTime(23, 59, 59)};
             }
-            case "last6months" -> new LocalDateTime[]{now.minusMonths(6), now};
-            case "1year" -> new LocalDateTime[]{now.minusYears(1), now};
+            case "last6months" -> new LocalDateTime[]{
+                    now.minusMonths(6).withHour(0).withMinute(0).withSecond(0).withNano(0),
+                    today.atTime(23, 59, 59)
+            };
+            case "1year" -> new LocalDateTime[]{
+                    now.minusYears(1).withHour(0).withMinute(0).withSecond(0).withNano(0),
+                    today.atTime(23, 59, 59)
+            };
             default -> {
                 try {
                     LocalDate parsed = LocalDate.parse(period, DateTimeFormatter.ofPattern("yyyy-MM"));
@@ -221,6 +235,7 @@ public class TrafficPoliceRepo {
             }
         };
     }
+
 
     private byte[] exportViolationsToCSV(List<Violation> violations) {
         StringBuilder sb = new StringBuilder();

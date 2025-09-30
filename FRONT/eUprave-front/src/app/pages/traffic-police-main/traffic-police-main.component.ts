@@ -9,7 +9,7 @@ import { filter } from 'rxjs/operators';
   styleUrls: ['./traffic-police-main.component.scss']
 })
 export class TrafficPoliceMainComponent implements OnInit {
-  currentSection: 'police' | 'fines' | 'vehicles' | 'violations' | 'owners' | null = null;
+  currentSection: 'police' | 'fines' | 'vehicles' | 'violations' | 'owners' | 'export' | 'statistics' | null = null;
 
   private updateFlags(url: string) {
     if (url.includes('/police')) this.currentSection = 'police';
@@ -17,6 +17,8 @@ export class TrafficPoliceMainComponent implements OnInit {
     else if (url.includes('/vehicles')) this.currentSection = 'vehicles';
     else if (url.includes('/violations')) this.currentSection = 'violations';
     else if (url.includes('/owners')) this.currentSection = 'owners';
+    else if (url.includes('/export')) this.currentSection = 'export';
+    else if (url.includes('/statistics')) this.currentSection = 'statistics';
     else this.currentSection = null;
   }
 

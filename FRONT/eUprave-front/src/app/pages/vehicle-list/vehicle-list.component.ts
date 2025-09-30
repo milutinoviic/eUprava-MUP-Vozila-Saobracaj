@@ -201,7 +201,7 @@ export class VehicleListComponent {
             };
 
             if (this.checkYourself) {
-              violation.policeId = this.token.getToken()!.toString();
+              violation.policeId = this.token.getUserId()!.toString();
             }
 
             const payload = { violation, driverId: driverIdObj };
