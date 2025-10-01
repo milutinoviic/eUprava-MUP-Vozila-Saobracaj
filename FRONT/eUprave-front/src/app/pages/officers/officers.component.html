@@ -1,0 +1,7 @@
+<h2>All Police Officers</h2>
+
+<ul>
+  <li *ngFor="let officer of officers">
+    {{officer.firstName}} {{officer.lastName}} - {{officer.rank}} - Email: {{officer.email}} - Suspended: {{officer.isSuspended}}
+  </li>
+</ul>

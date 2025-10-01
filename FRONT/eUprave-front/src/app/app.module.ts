@@ -19,6 +19,13 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { OwnerListComponent } from './pages/owner-list/owner-list.component';
 import { CreateOwnerComponent } from './pages/create-owner/create-owner.component';
 import { CreateDriverIdComponent } from './pages/create-driver-id/create-driver-id.component';
+import { FineListComponent } from './pages/fine-list/fine-list.component';
+import { VehicleListComponent } from './pages/vehicle-list/vehicle-list.component';
+import { ViolationListComponent } from './pages/violation-list/violation-list.component';
+import { FineComponent } from './pages/fine/fine.component';
+import { ViolationsComponent } from './pages/violations/violations.component';
+import { OfficersComponent } from './pages/officers/officers.component';
+import { StatisticComponent } from './pages/statistic/statistic.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +35,14 @@ import { CreateDriverIdComponent } from './pages/create-driver-id/create-driver-
     TrafficPoliceMainComponent,
     OwnerListComponent,
     CreateOwnerComponent,
-    CreateDriverIdComponent, // PoliceListComponent removed
+    CreateDriverIdComponent,
+    FineListComponent,
+    VehicleListComponent,
+    ViolationListComponent,
+    FineComponent,
+    ViolationsComponent,
+    OfficersComponent,
+    StatisticComponent
   ],
   imports: [
     BrowserModule,

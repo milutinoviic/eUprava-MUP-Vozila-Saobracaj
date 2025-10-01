@@ -8,6 +8,10 @@ import { TrafficPoliceMainComponent } from './pages/traffic-police-main/traffic-
 import { PoliceListComponent } from './pages/police-list/police-list.component';
 import { CreateOwnerComponent } from './pages/create-owner/create-owner.component';
 import { CreateDriverIdComponent } from './pages/create-driver-id/create-driver-id.component';
+import { FineComponent } from './pages/fine/fine.component';
+import { ViolationsComponent } from './pages/violations/violations.component';
+import { OfficersComponent } from './pages/officers/officers.component';
+import { StatisticComponent } from './pages/statistic/statistic.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
@@ -19,17 +23,23 @@ const routes: Routes = [
   { path: 'fines', component: TrafficPoliceMainComponent },
   { path: 'violations', component: TrafficPoliceMainComponent },
   { path: 'owners', component: TrafficPoliceMainComponent },
-  { path: 'police-list', component: PoliceListComponent }, // ✅ route to standalone component
+  { path: 'police-list', component: PoliceListComponent }, 
   { path: 'create-owner', component: CreateOwnerComponent },
-  { path: 'create-driverId', component: CreateDriverIdComponent } 
+  { path: 'create-driverId', component: CreateDriverIdComponent },
+  { path: 'unpaidFines', component: FineComponent },
+  { path: 'vehicleViolations', component: ViolationsComponent },
+  { path: 'officers', component: OfficersComponent },
+  { path: 'statistics', component: StatisticComponent },
+  
+
 
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes),
-    PoliceListComponent // ✅ standalone component imported
+    PoliceListComponent 
   ],
-  exports: [RouterModule] // ❌ PoliceListComponent removed
+  exports: [RouterModule]
 })
 export class AppRoutingModule {}

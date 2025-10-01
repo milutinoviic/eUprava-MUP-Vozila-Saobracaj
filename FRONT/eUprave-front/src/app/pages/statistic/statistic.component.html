@@ -1,0 +1,9 @@
+<h2>Police Statistics</h2>
+<input [(ngModel)]="policeId" placeholder="Enter Police Officer ID" />
+<button (click)="fetchStatistics()">Fetch Statistics</button>
+
+<ul>
+  <li *ngFor="let stat of statistics">
+    Date: {{stat.date}}, Number of Violations: {{stat.numberOfViolations}}
+  </li>
+</ul>
