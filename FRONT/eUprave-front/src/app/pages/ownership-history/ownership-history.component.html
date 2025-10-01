@@ -1,0 +1,27 @@
+<div>
+  <h2>Ownership History</h2>
+  <input [(ngModel)]="registration" placeholder="Enter vehicle registration" />
+  <button (click)="getHistory()">Get History</button>
+
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="error">{{ error }}</div>
+
+  <table *ngIf="history.length > 0">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Old Owner</th>
+        <th>New Owner</th>
+        <th>Vehicle</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let transfer of history">
+        <td>{{ transfer.dateOfTransfer | date:'short' }}</td>
+        <td>{{ transfer.ownerOld.firstName }} {{ transfer.ownerOld.lastName }}</td>
+        <td>{{ transfer.ownerNew.firstName }} {{ transfer.ownerNew.lastName }}</td>
+        <td>{{ transfer.vehicle.mark }} {{ transfer.vehicle.model }} ({{ transfer.vehicle.registration }})</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

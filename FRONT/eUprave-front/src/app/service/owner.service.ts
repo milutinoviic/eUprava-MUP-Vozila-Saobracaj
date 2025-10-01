@@ -20,4 +20,8 @@ export class OwnerService {
     return this.http.get<Owner[]>(this.apiUrl);
 
   }
+
+  getOwnerByRegistration(registration: string): Observable<Owner> {
+    return this.http.get<Owner>(`${this.apiUrl}/${registration}`);
+  }
 }

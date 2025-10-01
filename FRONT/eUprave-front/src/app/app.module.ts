@@ -26,6 +26,8 @@ import { FineComponent } from './pages/fine/fine.component';
 import { ViolationsComponent } from './pages/violations/violations.component';
 import { OfficersComponent } from './pages/officers/officers.component';
 import { StatisticComponent } from './pages/statistic/statistic.component';
+import { OwnershipHistoryComponent } from './pages/ownership-history/ownership-history.component';
+import { OwnershipTransferFormComponent } from './pages/ownership-transfer-form/ownership-transfer-form.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +44,9 @@ import { StatisticComponent } from './pages/statistic/statistic.component';
     FineComponent,
     ViolationsComponent,
     OfficersComponent,
-    StatisticComponent
+    StatisticComponent,
+    OwnershipHistoryComponent,
+    OwnershipTransferFormComponent
   ],
   imports: [
     BrowserModule,

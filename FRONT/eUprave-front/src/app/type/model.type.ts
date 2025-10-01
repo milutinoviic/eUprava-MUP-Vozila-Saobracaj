@@ -61,6 +61,40 @@ export interface StatisticDTO {
   numberOfViolations: number;
 }
 
+export interface VehicleDto {
+  id: string;
+  mark: string;
+  model: string;
+  registration: string;
+  year: number;
+  color: string;
+  isStolen: boolean;
+  ownerId: string;
+}
+
+export interface OwnerDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  jmbg: string;
+  email: string;
+}
+
+export interface OwnershipTransferDto {
+  id: string;
+  vehicle: VehicleDto;
+  ownerOld: OwnerDto;
+  ownerNew: OwnerDto;
+  dateOfTransfer: string; // ISO date string
+}
+
+export interface CreateOwnershipTransferDto {
+  vehicleId: string;
+  oldOwnerId: string;
+  newOwnerId: string;
+}
+
 
 
 

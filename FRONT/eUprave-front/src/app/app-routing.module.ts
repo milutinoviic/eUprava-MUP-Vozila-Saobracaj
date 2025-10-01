@@ -12,6 +12,8 @@ import { FineComponent } from './pages/fine/fine.component';
 import { ViolationsComponent } from './pages/violations/violations.component';
 import { OfficersComponent } from './pages/officers/officers.component';
 import { StatisticComponent } from './pages/statistic/statistic.component';
+import { OwnershipHistoryComponent } from './pages/ownership-history/ownership-history.component';
+import { OwnershipTransferFormComponent } from './pages/ownership-transfer-form/ownership-transfer-form.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
@@ -30,6 +32,8 @@ const routes: Routes = [
   { path: 'vehicleViolations', component: ViolationsComponent },
   { path: 'officers', component: OfficersComponent },
   { path: 'statistics', component: StatisticComponent },
+  { path: 'ownership-history', component: OwnershipHistoryComponent },
+  { path: 'ownership-transfer', component: OwnershipTransferFormComponent },
   
 
 
