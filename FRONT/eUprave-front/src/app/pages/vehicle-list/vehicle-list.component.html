@@ -106,7 +106,7 @@
     <div class="vehicle-actions">
       <button class="btn danger" (click)="showHistory(vehicle)">Show history</button>
       <button class="btn danger" *ngIf="!vehicle.stolen" (click)="reportAsStolen(vehicle)">Report as stolen</button>
-      <button class="btn-2" (click)="newViolationModal(vehicle)">New violation</button>
+      <button class="btn-2" *ngIf="!vehicle.stolen" (click)="newViolationModal(vehicle)">New violation</button>
     </div>
   </div>
 </div>

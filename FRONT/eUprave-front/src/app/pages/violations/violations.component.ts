@@ -19,6 +19,7 @@ export class ViolationsComponent {
     if (this.registration) {
       this.policeService.getVehicleViolations(this.registration).subscribe(data => {
         this.violations = data;
+        console.log(this.violations);
       });
     }
   }

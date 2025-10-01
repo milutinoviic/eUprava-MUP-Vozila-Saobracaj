@@ -26,7 +26,7 @@ export interface DriverId {
 
 export interface CreateDriverIdRequest {
   ownerJmbg: string;
-  picture: File; 
+  picture: File;
 }
 
 export interface FineDTO {
@@ -39,7 +39,7 @@ export interface FineDTO {
 
 export interface ViolationDTO {
   id: string;
-  type_of_violation: string;
+  typeOfViolation: TypeOfViolation;
   date: string;
   location: string;
   driverId: string;
@@ -47,12 +47,18 @@ export interface ViolationDTO {
   policeId: string;
 }
 
+export enum TypeOfViolation {
+  MINOR = 'MINOR',
+  MAJOR = 'MAJOR',
+  CRITICAL = 'CRITICAL'
+}
+
 export interface PolicePersonDTO {
   id: string;
   firstName: string;
   lastName: string;
   rank: string;
-  isSuspended: boolean;
+  suspended: boolean;
   email: string;
 }
 

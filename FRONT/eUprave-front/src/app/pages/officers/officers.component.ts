@@ -17,6 +17,7 @@ export class OfficersComponent {
   ngOnInit(): void {
     this.policeService.getAllOfficers().subscribe(data => {
       this.officers = data;
+      console.log(this.officers);
     });
   }
 

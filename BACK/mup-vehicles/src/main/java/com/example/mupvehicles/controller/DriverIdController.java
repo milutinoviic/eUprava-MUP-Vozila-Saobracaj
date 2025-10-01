@@ -6,8 +6,10 @@ import com.example.mupvehicles.dto.SuspendDriverIdRequest;
 import com.example.mupvehicles.service.DriverIdService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/driverIds")
@@ -28,10 +30,15 @@ public class DriverIdController {
     }
 
 
-    @PostMapping
-    public DriverIdDto createDriverId(@Valid @RequestBody CreateDriverIdDto createDriverIdDto) {
-        return driverIdService.createDriverId(createDriverIdDto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public DriverIdDto createDriverId(
+            @RequestPart("picture") MultipartFile picture,
+            @RequestParam("ownerJmbg") String ownerJmbg
+    ) {
+        CreateDriverIdDto dto = new CreateDriverIdDto(picture, ownerJmbg);
+        return driverIdService.createDriverId(dto);
     }
+
 
     @PatchMapping("/suspendDriverId")
     public DriverIdDto suspendDriverId(@Valid @RequestBody SuspendDriverIdRequest suspendDriverIdRequest) {

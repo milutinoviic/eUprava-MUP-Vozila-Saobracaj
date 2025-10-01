@@ -30,6 +30,7 @@ import { OfficersComponent } from './pages/officers/officers.component';
 import { StatisticComponent } from './pages/statistic/statistic.component';
 import { OwnershipHistoryComponent } from './pages/ownership-history/ownership-history.component';
 import { OwnershipTransferFormComponent } from './pages/ownership-transfer-form/ownership-transfer-form.component';
+import { MupMainComponent } from './pages/mup-main/mup-main.component';
 
 
 @NgModule({
@@ -52,7 +53,8 @@ import { OwnershipTransferFormComponent } from './pages/ownership-transfer-form/
     OfficersComponent,
     StatisticComponent,
     OwnershipHistoryComponent,
-    OwnershipTransferFormComponent
+    OwnershipTransferFormComponent,
+    MupMainComponent
   ],
   imports: [
     BrowserModule,

@@ -11,6 +11,14 @@
 </div>
 
 
-<div>
-
+<div class="button-container" *ngIf="role == 'ADMIN'">
+  <button class="btn btn-1" (click)="goTo('unpaidFines')">Fines</button>
+  <button class="btn btn-2" (click)="goTo('ownership-history')">Owners</button>
+  <button class="btn btn-3" (click)="goTo('officers')">Police</button>
+  <button class="btn btn-4" (click)="goTo('vehicleViolations')">Vehicles</button>
+  <button class="btn btn-5" (click)="goTo('vehicleViolations')">Violations</button>
+  <button class="btn btn-6" (click)="goTo('ownership-transfer')">Transfer</button>
+  <button class="btn btn-7" (click)="goTo('owner/statistics')">Statistics</button>
+  <button class="btn btn-8" (click)="goTo('create-owner')">Create Owner</button>
+  <button class="btn btn-9" (click)="goTo('create-driverId')">Create Driver ID</button>
 </div>

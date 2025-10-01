@@ -12,6 +12,7 @@ public class PoliceDTO {
     private final String lastName;
     private final boolean isSuspended;
     private final PolicePerson.Rank rank;
+    private final String email;
 
 
     public PoliceDTO(PolicePerson person) {
@@ -20,6 +21,7 @@ public class PoliceDTO {
         this.lastName = person.getLastName() != null ? person.getLastName() : "";
         this.isSuspended = person.isSuspended();
         this.rank = person.getRank() != null ? person.getRank() : PolicePerson.Rank.LOW;
+        this.email = person.getEmail() != null ? person.getEmail() : "";
     }
 
 }

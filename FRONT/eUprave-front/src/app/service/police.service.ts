@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class PoliceService {
 
- 
+
   private baseUrl = 'http://localhost:8082/police';
 
   constructor(private http: HttpClient) { }

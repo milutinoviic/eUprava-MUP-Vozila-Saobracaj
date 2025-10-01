@@ -38,7 +38,7 @@ const routes: Routes = [
   { path: 'unpaidFines', component: FineComponent },
   { path: 'vehicleViolations', component: ViolationsComponent },
   { path: 'officers', component: OfficersComponent },
-  { path: 'statistics', component: StatisticComponent },
+  { path: 'owner/statistics', component: StatisticComponent },
   { path: 'ownership-history', component: OwnershipHistoryComponent },
   { path: 'ownership-transfer', component: OwnershipTransferFormComponent },
 

@@ -1,10 +1,10 @@
 package com.example.mupvehicles.service.Impl;
 
-import com.example.mupvehicles.dto.FineDTO;
-import com.example.mupvehicles.dto.PolicePersonDTO;
-import com.example.mupvehicles.dto.StatisticDTO;
-import com.example.mupvehicles.dto.ViolationDTO;
+import com.example.mupvehicles.dto.*;
+import com.example.mupvehicles.model.Vehicle;
+import com.example.mupvehicles.service.VehicleService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +24,14 @@ public class PoliceClientService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    @Autowired
+    private VehicleService vehicleService;
+
     @Value("${traficePolice.service.url}")
     private String baseUrl;
 
     public List<FineDTO> checkUnpaidFines(String driverId) {
-        String url = baseUrl + "/fines/" + driverId;
+        String url = baseUrl + "/fines/unpaid/" + driverId;
         ResponseEntity<FineDTO[]> response = restTemplate.exchange(
                 url,
                 org.springframework.http.HttpMethod.GET,
@@ -39,7 +42,8 @@ public class PoliceClientService {
     }
 
     public List<ViolationDTO> checkVehicleViolations(String registration) {
-        String url = baseUrl + "/history/violations/" + registration;
+        VehicleDto vehicle = vehicleService.findVehicleByRegistration(registration);
+        String url = baseUrl + "/violations/history/vehicle/" + vehicle.getId();
         ResponseEntity<ViolationDTO[]> response = restTemplate.exchange(
                 url,
                 org.springframework.http.HttpMethod.GET,

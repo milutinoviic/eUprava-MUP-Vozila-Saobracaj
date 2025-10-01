@@ -94,3 +94,51 @@
     box-shadow: 0 2px #e58e00;
   }
 }
+/* 6. Neon Effect */
+.btn-6 {
+  background: #0abde3;
+  box-shadow: 0 0 10px #0abde3, 0 0 20px #0abde3, 0 0 40px #0abde3;
+  text-shadow: 0 0 5px #fff;
+
+  &:hover {
+    box-shadow: 0 0 20px #48dbfb, 0 0 40px #48dbfb, 0 0 60px #48dbfb;
+    transform: scale(1.05);
+  }
+}
+
+/* 7. Gradient Shift */
+.btn-7 {
+  background: linear-gradient(90deg, #ff9ff3, #f368e0);
+  background-size: 200% auto;
+
+  &:hover {
+    background-position: right center;
+    transform: scale(1.05);
+  }
+}
+
+/* 8. Flip Effect */
+.btn-8 {
+  background: #10ac84;
+  perspective: 1000px;
+
+  &:hover {
+    transform: rotateY(15deg) scale(1.05);
+    background: #1dd1a1;
+  }
+}
+
+/* 9. Pulse Effect */
+.btn-9 {
+  background: #341f97;
+
+  &:hover {
+    animation: pulse 1s infinite;
+  }
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(52, 31, 151, 0.7); }
+  70%  { box-shadow: 0 0 0 15px rgba(52, 31, 151, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 31, 151, 0); }
+}
