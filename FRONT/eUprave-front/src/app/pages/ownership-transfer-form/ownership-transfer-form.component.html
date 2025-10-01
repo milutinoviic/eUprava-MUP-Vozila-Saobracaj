@@ -1,0 +1,21 @@
+<div>
+  <h2>Transfer Ownership</h2>
+  <form (ngSubmit)="submitTransfer()">
+    <div>
+      <label>Vehicle ID:</label>
+      <input [(ngModel)]="dto.vehicleId" name="vehicleId" required />
+    </div>
+    <div>
+      <label>Old Owner ID:</label>
+      <input [(ngModel)]="dto.oldOwnerId" name="oldOwnerId" required />
+    </div>
+    <div>
+      <label>New Owner ID:</label>
+      <input [(ngModel)]="dto.newOwnerId" name="newOwnerId" required />
+    </div>
+    <button type="submit">Transfer</button>
+  </form>
+
+  <div *ngIf="successMessage" style="color:green">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" style="color:red">{{ errorMessage }}</div>
+</div>

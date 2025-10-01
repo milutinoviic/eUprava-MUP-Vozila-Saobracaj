@@ -1,0 +1,56 @@
+<div class="container">
+  <h2>Create Owner</h2>
+
+  <form [formGroup]="ownerForm" (ngSubmit)="onSubmit()">
+    <div>
+      <label>First Name</label>
+      <input type="text" formControlName="firstName" />
+      <div *ngIf="submitted && ownerForm.controls['firstName'].invalid" class="error">
+        First name must be at least 3 characters.
+      </div>
+    </div>
+
+    <div>
+      <label>Last Name</label>
+      <input type="text" formControlName="lastName" />
+      <div *ngIf="submitted && ownerForm.controls['lastName'].invalid" class="error">
+        Last name must be at least 3 characters.
+      </div>
+    </div>
+
+    <div>
+      <label>Address</label>
+      <input type="text" formControlName="address" />
+      <div *ngIf="submitted && ownerForm.controls['address'].invalid" class="error">
+        Address must be at least 3 characters.
+      </div>
+    </div>
+
+    <div>
+      <label>JMBG</label>
+      <input type="text" formControlName="jmbg" maxlength="9" />
+      <div *ngIf="submitted && ownerForm.controls['jmbg'].invalid" class="error">
+        JMBG must be exactly 9 characters.
+      </div>
+    </div>
+
+    <div>
+      <label>Email</label>
+      <input type="email" formControlName="email" />
+      <div *ngIf="submitted && ownerForm.controls['email'].invalid" class="error">
+        Please enter a valid email.
+      </div>
+    </div>
+
+    <button type="submit">Create Owner</button>
+  </form>
+
+  <div *ngIf="createdOwner" class="success">
+    <h3>Owner created successfully!</h3>
+    <p><b>ID:</b> {{ createdOwner.id }}</p>
+    <p><b>Name:</b> {{ createdOwner.firstName }} {{ createdOwner.lastName }}</p>
+    <p><b>Address:</b> {{ createdOwner.address }}</p>
+    <p><b>JMBG:</b> {{ createdOwner.jmbg }}</p>
+    <p><b>Email:</b> {{ createdOwner.email }}</p>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<h2>Unpaid Fines</h2>
+<input [(ngModel)]="driverId" placeholder="Enter Driver ID" />
+<button (click)="fetchFines()">Fetch Fines</button>
+
+<ul>
+  <li *ngFor="let fine of fines">
+    ID: {{fine.id}}, Amount: {{fine.amount}}€, Paid: {{fine.isPaid}}, Date: {{fine.date}}, Violation ID: {{fine.violationID}}
+  </li>
+</ul>

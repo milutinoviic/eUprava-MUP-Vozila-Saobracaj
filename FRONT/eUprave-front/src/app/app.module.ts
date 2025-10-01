@@ -17,11 +17,20 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AuthInterceptor} from './core/interceptor/auth.interceptor';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { OwnerListComponent } from './pages/owner-list/owner-list.component';
+import { CreateOwnerComponent } from './pages/create-owner/create-owner.component';
+import { CreateDriverIdComponent } from './pages/create-driver-id/create-driver-id.component';
 import { FineListComponent } from './pages/fine-list/fine-list.component';
 import { VehicleListComponent } from './pages/vehicle-list/vehicle-list.component';
 import { ViolationListComponent } from './pages/violation-list/violation-list.component';
 import { ExportViolationsComponent } from './pages/export-violations/export-violations.component';
 import { DailyStatisticsComponent } from './pages/daily-statistics/daily-statistics.component';
+import { FineComponent } from './pages/fine/fine.component';
+import { ViolationsComponent } from './pages/violations/violations.component';
+import { OfficersComponent } from './pages/officers/officers.component';
+import { StatisticComponent } from './pages/statistic/statistic.component';
+import { OwnershipHistoryComponent } from './pages/ownership-history/ownership-history.component';
+import { OwnershipTransferFormComponent } from './pages/ownership-transfer-form/ownership-transfer-form.component';
+
 
 @NgModule({
   declarations: [
@@ -30,11 +39,20 @@ import { DailyStatisticsComponent } from './pages/daily-statistics/daily-statist
     HomeComponent,
     TrafficPoliceMainComponent,
     OwnerListComponent,
+    CreateOwnerComponent,
+    CreateDriverIdComponent,
     FineListComponent,
     VehicleListComponent,
     ViolationListComponent,
     ExportViolationsComponent,
     DailyStatisticsComponent, // PoliceListComponent removed
+
+    FineComponent,
+    ViolationsComponent,
+    OfficersComponent,
+    StatisticComponent,
+    OwnershipHistoryComponent,
+    OwnershipTransferFormComponent
   ],
   imports: [
     BrowserModule,
