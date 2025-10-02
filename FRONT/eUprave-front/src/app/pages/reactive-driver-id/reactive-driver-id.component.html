@@ -1,0 +1,26 @@
+<div class="reactivate-form">
+  <h2>Driver License Reactivation</h2>
+
+  <input
+    type="text"
+    placeholder="Enter Driver ID"
+    [(ngModel)]="driverId"
+  />
+  <button (click)="onReactivate()">Reactivate</button>
+
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+  <div *ngIf="driverData" class="result">
+    <h3>Result</h3>
+    <p><b>ID:</b> {{ driverData.id }}</p>
+    <p><b>Suspended:</b> {{ driverData.suspended ? 'YES' : 'NO' }}</p>
+    <p><b>Violation Points:</b> {{ driverData.numberOfViolationPoints }}</p>
+    <img *ngIf="driverData.picture" [src]="driverData.picture" alt="Driver Picture" width="150"/>
+
+    <h4>Owner</h4>
+    <p>{{ driverData.owner.firstName }} {{ driverData.owner.lastName }}</p>
+    <p><b>Address:</b> {{ driverData.owner.address }}</p>
+    <p><b>Email:</b> {{ driverData.owner.email }}</p>
+    <p><b>JMBG:</b> {{ driverData.owner.jmbg }}</p>
+  </div>
+</div>

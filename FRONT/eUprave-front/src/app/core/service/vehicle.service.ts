@@ -3,6 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {RoutesService} from './routes.service';
 import {Observable} from 'rxjs';
 import {VehicleDTO} from '../type/auth.types';
+import {CreateVehicleRequest, VehicleDto} from '../../type/model.type';
 
 @Injectable({
   providedIn: 'root'
@@ -37,5 +38,16 @@ export class VehicleService {
   }
 
 
+  createVehicle(request: CreateVehicleRequest): Observable<VehicleDto> {
+    return this.http.post<VehicleDto>(
+      this.route.VEHICLES_CREATE,
+      request,
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+  }
 
 }

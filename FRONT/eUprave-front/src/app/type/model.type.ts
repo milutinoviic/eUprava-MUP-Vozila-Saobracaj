@@ -26,7 +26,6 @@ export interface DriverId {
 
 export interface CreateDriverIdRequest {
   ownerJmbg: string;
-  picture: File;
 }
 
 export interface FineDTO {
@@ -102,8 +101,33 @@ export interface CreateOwnershipTransferDto {
 }
 
 
+export interface CreateVehicleRequest {
+  mark: string;
+  model: string;
+  registration: string;
+  year: number;
+  color: string;
+  ownerJmbg: string;
+}
 
+export interface VehicleDto {
+  id: string;
+  mark: string;
+  model: string;
+  registration: string;
+  year: number;
+  color: string;
+  stolen: boolean;
+  owner: OwnerDto;
+}
 
+export interface DriverIdDto {
+  id: string;
+  suspended: boolean;
+  numberOfViolationPoints: number;
+  picture: string;
+  owner: OwnerDto;
+}
 
 
 

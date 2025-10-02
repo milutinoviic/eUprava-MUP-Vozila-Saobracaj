@@ -1,0 +1,37 @@
+.forbidden-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  text-align: center;
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem;
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    background-color: #721c24;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+      background-color: #501217;
+    }
+  }
+}

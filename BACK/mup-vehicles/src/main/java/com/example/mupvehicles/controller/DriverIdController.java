@@ -36,12 +36,12 @@ public class DriverIdController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public DriverIdDto createDriverId(
-            @RequestPart("picture") MultipartFile picture,
             @RequestParam("ownerJmbg") String ownerJmbg
     ) {
-        CreateDriverIdDto dto = new CreateDriverIdDto(picture, ownerJmbg);
+        CreateDriverIdDto dto = new CreateDriverIdDto(ownerJmbg);
         return driverIdService.createDriverId(dto);
     }
+
 
     @PatchMapping("/suspendDriverId")
     public DriverIdDto suspendDriverId(@Valid @RequestBody SuspendDriverIdRequest suspendDriverIdRequest) {

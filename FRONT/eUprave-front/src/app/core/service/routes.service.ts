@@ -12,6 +12,7 @@ export class RoutesService {
   // =====================
   private _auth_api_url = 'http://localhost:8000/api/auth';
   private _traffic_api_url = 'http://localhost:8010/api';
+  private _mup_api_url = 'http://localhost:8082/api';
 
   // =====================
   // AUTH ENDPOINTS
@@ -58,7 +59,7 @@ export class RoutesService {
     `${this._traffic_api_url}/vehicles/stolen/${registration}`;
   public readonly VEHICLE_SEARCH = `${this._traffic_api_url}/vehicles/search`;
   public readonly VEHICLES_DRIVER = (policeId: string) => `${this._traffic_api_url}/vehicles/driver/${policeId}`;
-
+  public readonly VEHICLES_CREATE = `${this._mup_api_url}/vehicles/createVehicle`;
   // =====================
   // VIOLATIONS
   // =====================

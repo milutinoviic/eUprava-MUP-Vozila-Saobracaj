@@ -104,7 +104,7 @@ public class VehicleServiceImpl implements VehicleService {
             throw new RuntimeException("Vehicle does not exist");
         }
 
-        vehicle.setStolen(true);
+        vehicle.setStolen(!vehicle.isStolen());
         vehicleRepository.save(vehicle);
         return vehicleMapper.converttoVehicleDto(vehicle);
 

@@ -1,0 +1,45 @@
+<div class="create-vehicle">
+  <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()">
+
+    <div>
+      <label>Mark:</label>
+      <input type="text" formControlName="mark">
+    </div>
+
+    <div>
+      <label>Model:</label>
+      <input type="text" formControlName="model">
+    </div>
+
+    <div>
+      <label>Registration:</label>
+      <input type="text" formControlName="registration">
+    </div>
+
+    <div>
+      <label>Year:</label>
+      <input type="number" formControlName="year">
+    </div>
+
+    <div>
+      <label>Color:</label>
+      <input type="text" formControlName="color">
+    </div>
+
+    <div>
+      <label>Owner JMBG:</label>
+      <input type="text" formControlName="ownerJmbg">
+    </div>
+
+    <button type="submit" [disabled]="vehicleForm.invalid">Create Vehicle</button>
+  </form>
+
+  <div *ngIf="createdVehicle">
+    <h3>Vehicle Created:</h3>
+    <pre>{{ createdVehicle | json }}</pre>
+  </div>
+
+  <div *ngIf="errorMessage" style="color: red;">
+    {{ errorMessage }}
+  </div>
+</div>

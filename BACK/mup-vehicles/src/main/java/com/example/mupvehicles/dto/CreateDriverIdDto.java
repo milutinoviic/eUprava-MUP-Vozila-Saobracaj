@@ -11,8 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class CreateDriverIdDto {
 
-    @NotNull(message = "File cannot be null")
-    private MultipartFile picture;
 
     @NotNull(message = "Owner JMBG cannot be null")
     private String ownerJmbg;

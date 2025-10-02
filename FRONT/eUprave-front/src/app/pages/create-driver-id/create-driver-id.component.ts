@@ -31,11 +31,10 @@ export class CreateDriverIdComponent {
   }
 
   onSubmit() {
-    if (this.driverIdForm.invalid || !this.selectedFile) return;
+    if (this.driverIdForm.invalid) return;
 
     const request: CreateDriverIdRequest = {
       ownerJmbg: this.driverIdForm.get('ownerJmbg')?.value,
-      picture: this.selectedFile
     };
 
     this.driverIdService.createDriverId(request)

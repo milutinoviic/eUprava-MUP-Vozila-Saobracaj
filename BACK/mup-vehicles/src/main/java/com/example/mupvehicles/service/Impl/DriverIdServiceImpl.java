@@ -75,36 +75,18 @@ public class DriverIdServiceImpl implements DriverIdService {
             throw new RuntimeException("DriverId already exists for this owner");
         }
 
-        MultipartFile file = createDriverIdDto.getPicture();
+        DriverId driverId = new DriverId();
+        driverId.setId(UUID.randomUUID().toString());
+        driverId.setSuspended(false);
+        driverId.setNumberOfViolationPoints(0);
+        driverId.setPicture(null);
+        driverId.setOwner(owner);
 
-        try {
+        driverIdRepository.save(driverId);
 
-            String uploadDir = "src/main/resources/Images";
-            File dir = new File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
-
-
-            String imageName = "driver_" + owner.getJmbg() + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir, imageName).normalize();
-
-
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            DriverId driverId = new DriverId();
-            driverId.setId(UUID.randomUUID().toString());
-            driverId.setSuspended(false);
-            driverId.setNumberOfViolationPoints(0);
-            driverId.setPicture("/Images/" + imageName);
-            driverId.setOwner(owner);
-
-            driverIdRepository.save(driverId);
-
-            return driverIdMapper.convertDriverIdToDto(driverId);
-
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save picture", e);
-        }
+        return driverIdMapper.convertDriverIdToDto(driverId);
     }
+
 
     @Override
     public DriverIdDto getDriverId(String jmbg) {

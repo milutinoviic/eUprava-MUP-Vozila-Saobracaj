@@ -31,6 +31,9 @@ import { StatisticComponent } from './pages/statistic/statistic.component';
 import { OwnershipHistoryComponent } from './pages/ownership-history/ownership-history.component';
 import { OwnershipTransferFormComponent } from './pages/ownership-transfer-form/ownership-transfer-form.component';
 import { MupMainComponent } from './pages/mup-main/mup-main.component';
+import { CreateVehicleComponent } from './pages/create-vehicle/create-vehicle.component';
+import { ReactiveDriverIdComponent } from './pages/reactive-driver-id/reactive-driver-id.component';
+import { ForbiddenComponent } from './pages/forbidden/forbidden.component';
 
 
 @NgModule({
@@ -54,7 +57,9 @@ import { MupMainComponent } from './pages/mup-main/mup-main.component';
     StatisticComponent,
     OwnershipHistoryComponent,
     OwnershipTransferFormComponent,
-    MupMainComponent
+    MupMainComponent,
+    ReactiveDriverIdComponent,
+    ForbiddenComponent
   ],
   imports: [
     BrowserModule,
@@ -65,7 +70,8 @@ import { MupMainComponent } from './pages/mup-main/mup-main.component';
     FormsModule,
     ReactiveFormsModule,
     PoliceListComponent, // ✅ standalone, keep here
-    NgChartsModule       // ✅ use module instead of BaseChartDirective
+    NgChartsModule,       // ✅ use module instead of BaseChartDirective
+    CreateVehicleComponent,
   ],
   providers: [ { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }],
   bootstrap: [AppComponent]

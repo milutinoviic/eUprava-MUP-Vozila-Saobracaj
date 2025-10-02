@@ -150,10 +150,11 @@ export class VehicleListComponent {
   }
 
   reportAsStolen(vehicle: VehicleDTO) {
+    const state = vehicle.stolen;
     this.vehicleService.reportAsStolen(vehicle.registration).subscribe({
       next: () => {
         this.toastr.success("Reported the vehicle as stolen");
-        vehicle.stolen = true;
+        vehicle.stolen = !state;
       },
       error: () => this.toastr.error("Error")
     });
