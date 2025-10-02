@@ -10,6 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+
+
 
 @RestController
 @RequestMapping("/api/driverIds")
@@ -39,7 +43,6 @@ public class DriverIdController {
         return driverIdService.createDriverId(dto);
     }
 
-
     @PatchMapping("/suspendDriverId")
     public DriverIdDto suspendDriverId(@Valid @RequestBody SuspendDriverIdRequest suspendDriverIdRequest) {
         return driverIdService.suspendDriverId(suspendDriverIdRequest);
@@ -54,6 +57,16 @@ public class DriverIdController {
     public ResponseEntity<Void> deleteDriverId(@PathVariable String id) {
         driverIdService.deleteDriverId(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/picture")
+    public ResponseEntity<Resource> getDriverIdPicture(@RequestParam String userJmbg) {
+        Resource image = driverIdService.getDriverIdPicture(userJmbg);
+
+        String contentType = "image/jpeg";
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(image);
     }
 
 }

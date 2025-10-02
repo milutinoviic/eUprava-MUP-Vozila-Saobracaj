@@ -12,9 +12,13 @@ import com.example.mupvehicles.service.DriverIdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +37,29 @@ public class DriverIdServiceImpl implements DriverIdService {
         this.driverIdRepository = driverIdRepository;
         this.ownerRepository = ownerRepository;
         this.driverIdMapper = driverIdMapper;
+    }
+
+    @Override
+    public Resource getDriverIdPicture(String userJmbg) {
+        Owner owner = ownerRepository.findByJmbg(userJmbg);
+
+        if (owner == null) {
+            throw new RuntimeException("Owner not found");
+        }
+
+        DriverId driverId = driverIdRepository.findByOwner(owner)
+                .orElseThrow(() -> new RuntimeException("DriverId not found for this owner"));
+
+        try {
+            Path filePath = Paths.get("src/main/resources" + driverId.getPicture()).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (!resource.exists()) {
+                throw new RuntimeException("File not found: " + driverId.getPicture());
+            }
+            return resource;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Failed to load image", e);
+        }
     }
 
     @Override
